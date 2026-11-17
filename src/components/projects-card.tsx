@@ -1,12 +1,13 @@
 import Image from "next/image"
 import { Check, Gamepad2, Github, MapPin, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { isExternal, type Project } from "@/lib/site"
+import { isExternal } from "@/lib/site"
+import type { FeaturedProject } from "@/lib/projects"
 import { ComingSoon } from "@/components/coming-soon"
 
 /* Presentation only — content and links live in site.ts */
 const LOOK: Record<
-  Project["id"],
+  FeaturedProject["id"],
   { icon: LucideIcon; tile: string; bar: string; check: string }
 > = {
   foodmap: {
@@ -24,7 +25,7 @@ const LOOK: Record<
 }
 
 interface ProjectCardProps {
-  project: Project
+  project: FeaturedProject
   className?: string
 }
 
@@ -37,7 +38,7 @@ interface ProjectCardProps {
  * link keeps a short accessible name. Its focus ring is drawn on the card.
  */
 export function ProjectCard({ project, className }: ProjectCardProps) {
-  const { id, name, tagline, stack, highlights, image, href } = project
+  const { id, name, tagline, stack, highlights, image, repository: href } = project
   const look = LOOK[id]
   const Icon = look.icon
   const external = href !== null && isExternal(href)

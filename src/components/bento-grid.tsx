@@ -1,5 +1,6 @@
 import { Github } from "lucide-react"
 import { site } from "@/lib/site"
+import { featuredProjects } from "@/lib/projects"
 import { BentoCard } from "@/components/bento-card"
 import { ContactCard } from "@/components/contact-card"
 import { CVCard } from "@/components/cv-card"
@@ -26,7 +27,7 @@ export function BentoGrid() {
   return (
     <nav aria-label="Primary destinations">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-6 sm:gap-5 lg:grid-cols-12 lg:gap-6">
-        {site.projects.map((project) => (
+        {featuredProjects.map((project) => (
           <ProjectCard
             key={project.id}
             project={project}

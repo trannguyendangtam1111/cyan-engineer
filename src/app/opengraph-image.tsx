@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og"
 import { site } from "@/lib/site"
+import { featuredProjects } from "@/lib/projects"
 
 /* Social preview (1200×630), rendered at build time with the site's dark theme colours. */
 export const alt = `${site.name} — ${site.role} · ${site.domain}`
@@ -77,8 +78,8 @@ export default function OpengraphImage() {
         {/* Projects + availability */}
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {[
-            { label: site.projects[0]?.name, bg: C.mint, ink: C.mintInk },
-            { label: site.projects[1]?.name, bg: C.butterSoft, ink: C.butterInk },
+            { label: featuredProjects[0]?.name, bg: C.mint, ink: C.mintInk },
+            { label: featuredProjects[1]?.name, bg: C.butterSoft, ink: C.butterInk },
           ]
             .filter((p) => p.label)
             .map((p) => (

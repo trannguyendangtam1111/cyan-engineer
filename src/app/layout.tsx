@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { site } from "@/lib/site"
+import { featuredProjects } from "@/lib/projects"
 import { TopBar } from "@/components/top-bar"
 
 const inter = Inter({
@@ -13,7 +14,7 @@ const inter = Inter({
 
 const title = `${site.name} (${site.brand}) — ${site.role}`
 // ~150 characters, so search results show it whole
-const description = `${site.name}, ${site.role} in ${site.location}. Spring Boot and PostgreSQL projects: ${site.projects
+const description = `${site.name}, ${site.role} in ${site.location}. Spring Boot and PostgreSQL projects: ${featuredProjects
   .map((p) => p.name)
   .join(", ")}. Open to Fresher/Junior roles.`
 
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     site.name,
     site.brand,
     site.location,
-    ...site.projects.map((p) => p.name),
+    ...featuredProjects.map((p) => p.name),
   ],
   authors: [{ name: site.name, url: site.url }],
   alternates: { canonical: "/" },
