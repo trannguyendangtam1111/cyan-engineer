@@ -24,6 +24,8 @@ export interface Project {
   stack: string[]
   /** Backend engineering points, each traceable to the project's README. */
   highlights: string[]
+  /** Screenshot in /public, copied from the project's docs/screenshots. */
+  image: { src: string; alt: string }
   /** Public repository or live URL. */
   href: Destination
 }
@@ -72,6 +74,10 @@ export const site: SiteConfig = {
         "Vietnamese-aware search with pg_trgm and unaccent, plus PostGIS spatial filtering",
         "Versioned Flyway migrations and per-IP rate limiting",
       ],
+      image: {
+        src: "/projects/foodmap-home.png",
+        alt: "FoodMap home page in Vietnamese: a food and restaurant search box, the “What to eat today?” picker, and food categories around central Ho Chi Minh City.",
+      },
       href: "https://github.com/trannguyendangtam1111/FoodMap",
     },
     {
@@ -84,6 +90,10 @@ export const site: SiteConfig = {
         "Transactional coin wallet with row locks, an auditable ledger, and idempotent purchases",
         "PostgreSQL Testcontainers, ArchUnit rules, and GitHub Actions CI",
       ],
+      image: {
+        src: "/projects/cyan-arcade-home.png",
+        alt: "Cyan Arcade hub page: a welcome banner, completed daily challenges for Snake, 2048, and Tetris, and the featured games row.",
+      },
       href: "https://github.com/trannguyendangtam1111/cyan-arcade",
     },
   ],
