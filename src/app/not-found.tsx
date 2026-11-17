@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils"
 export const metadata: Metadata = {
   title: "Page not found",
   description: "This page does not exist.",
-  // No canonical; Next.js adds `noindex` to 404 responses itself.
+  // No canonical. Set robots here too, or the root layout's "index, follow"
+  // is inherited next to the `noindex` that Next.js adds to 404 responses.
   alternates: { canonical: null },
+  robots: { index: false },
 }
 
 const button =
