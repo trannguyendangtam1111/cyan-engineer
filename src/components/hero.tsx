@@ -70,9 +70,12 @@ export function Hero() {
           ) : (
             <a
               href={cv}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`${button} bg-accent text-accent-on transition-colors duration-100 hover:bg-accent-hover active:bg-accent-pressed focus-visible:outline-none focus-visible:ring-focus`}
             >
-              View CV <span aria-hidden="true">→</span>
+              View CV <span aria-hidden="true">↗</span>
+              <span className="sr-only"> (PDF, opens in new tab)</span>
             </a>
           )}
 

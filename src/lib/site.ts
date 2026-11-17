@@ -1,11 +1,13 @@
 /*
  * Identity, projects and destinations — single source of truth for the homepage.
  *
- * A destination set to `null` renders as a clearly labelled "Coming soon"
- * state. Never put a guessed or example URL here.
+ * A destination set to `null` is hidden (or, for a project, labelled
+ * "Coming soon"). Never put a guessed or example URL here.
  *
  * VERIFIED (local git remotes; public on GitHub, checked 2026-11-17)
  *   links.github       — profile
+ *   links.cv           — the owner's CV.pdf, published with approval (2026-11-17)
+ *   links.email        — the address printed on that CV, approved for the site
  *   foodmap.href       — dev/FoodMap → trannguyendangtam1111/FoodMap
  *   cyanarcade.href    — dev/GameHub → trannguyendangtam1111/cyan-arcade
  *   stack, highlights  — each repo's README, cross-checked against its pom.xml
@@ -14,7 +16,7 @@
  *                        (pom.xml, frontend sources, migrations, CI workflow)
  *
  * NEEDS INPUT — null until real details exist
- *   links.cv, links.linkedin, links.email
+ *   links.linkedin
  */
 export type Destination = string | null
 
@@ -65,9 +67,9 @@ export const site: SiteConfig = {
   availability: "Available for backend roles · Remote · EU",
   links: {
     github: "https://github.com/trannguyendangtam1111",
-    cv: null,
+    cv: "/cv/tran-nguyen-dang-tam-cv.pdf",
     linkedin: null,
-    email: null,
+    email: "mailto:trannguyendangtam1111@gmail.com",
   },
   projects: [
     {
