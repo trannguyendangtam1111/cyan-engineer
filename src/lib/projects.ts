@@ -9,8 +9,12 @@ import type { Destination } from "@/lib/site"
  * VERIFIED (local git remotes; public on GitHub, checked 2026-11-17)
  *   foodmap.repository    — dev/FoodMap → trannguyendangtam1111/FoodMap
  *   cyanarcade.repository — dev/GameHub → trannguyendangtam1111/cyan-arcade
+ *   englishlab.repository — dev/EnglishLab → trannguyendangtam1111/englishLab
  *   stack, highlights     — each repo's README, cross-checked against its pom.xml
  *                           and source (Cyan Arcade: the `main` branch)
+ *   englishlab            — README, backend/pom.xml and frontend/package.json on
+ *                           the public `main` branch (9059f57). It has no AI
+ *                           features yet, so none are claimed.
  *
  * NEEDS INPUT — null until the owner confirms
  *   status (all projects)
@@ -34,7 +38,7 @@ export interface ProjectDetail {
 
 export interface Project {
   /** Stable key for presentation lookups (icon, accent colour). */
-  id: "foodmap" | "cyanarcade"
+  id: "foodmap" | "cyanarcade" | "englishlab"
   /** URL segment for /projects/[slug]. */
   slug: string
   name: string
@@ -95,6 +99,19 @@ export const projects: Project[] = [
     featured: true,
     status: null,
   },
+  {
+    id: "englishlab",
+    slug: "englishlab",
+    name: "EnglishLab",
+    tagline: "A personal English learning platform with a daily study plan, vocabulary review, and IELTS practice.",
+    stack: ["Java 21", "Spring Boot", "PostgreSQL", "React/TypeScript"],
+    // List-only entry: no highlights, screenshot or detail page yet
+    highlights: [],
+    image: null,
+    repository: "https://github.com/trannguyendangtam1111/englishLab",
+    featured: false,
+    status: null,
+  },
 ]
 
 function isFeatured(project: Project): project is FeaturedProject {
@@ -103,3 +120,6 @@ function isFeatured(project: Project): project is FeaturedProject {
 
 /** Homepage projects, in display order. */
 export const featuredProjects: FeaturedProject[] = projects.filter(isFeatured)
+
+/** Listed on /projects below the featured ones. */
+export const otherProjects: Project[] = projects.filter((project) => !isFeatured(project))

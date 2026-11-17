@@ -1,32 +1,16 @@
-import { Check, Gamepad2, Github, MapPin, type LucideIcon } from "lucide-react"
+import { Check, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { isExternal } from "@/lib/site"
 import type { FeaturedProject } from "@/lib/projects"
 import { ComingSoon } from "@/components/coming-soon"
 import { BrowserFrame } from "@/components/project/browser-frame"
+import { PROJECT_LOOK } from "@/components/project/project-look"
 import { StackTags } from "@/components/project/stack-tags"
-
-/* Presentation only — content and links live in projects.ts */
-const LOOK: Record<
-  FeaturedProject["id"],
-  { icon: LucideIcon; tile: string; bar: string; check: string }
-> = {
-  foodmap: {
-    icon: MapPin,
-    tile: "bg-mint text-mint-ink",
-    bar: "bg-mint-ink",
-    check: "text-mint-ink",
-  },
-  cyanarcade: {
-    icon: Gamepad2,
-    tile: "bg-butter-soft text-butter-ink",
-    bar: "bg-butter",
-    check: "text-butter-ink",
-  },
-}
 
 interface ProjectCardProps {
   project: FeaturedProject
+  /** h2 on the homepage; h3 under a section heading on /projects. */
+  headingLevel?: "h2" | "h3"
   className?: string
 }
 
@@ -38,9 +22,9 @@ interface ProjectCardProps {
  * whole card with an ::after overlay, so the card is clickable while the
  * link keeps a short accessible name. Its focus ring is drawn on the card.
  */
-export function ProjectCard({ project, className }: ProjectCardProps) {
+export function ProjectCard({ project, headingLevel: Heading = "h2", className }: ProjectCardProps) {
   const { id, name, tagline, stack, highlights, image, repository: href } = project
-  const look = LOOK[id]
+  const look = PROJECT_LOOK[id]
   const Icon = look.icon
   const external = href !== null && isExternal(href)
   const titleId = `project-${id}-title`
@@ -83,12 +67,12 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
           >
             <Icon size={17} strokeWidth={2} />
           </span>
-          <h2
+          <Heading
             id={titleId}
             className="text-fg-strong text-[20px] font-bold leading-[1.2] tracking-[-0.02em] sm:text-[22px]"
           >
             {name}
-          </h2>
+          </Heading>
         </div>
 
         <p className="mt-3 text-[15px] leading-[1.55] text-fg-muted text-pretty">
