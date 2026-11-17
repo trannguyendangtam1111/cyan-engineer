@@ -1,11 +1,12 @@
-import Image from "next/image"
 import { Check, Gamepad2, Github, MapPin, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { isExternal } from "@/lib/site"
 import type { FeaturedProject } from "@/lib/projects"
 import { ComingSoon } from "@/components/coming-soon"
+import { BrowserFrame } from "@/components/project/browser-frame"
+import { StackTags } from "@/components/project/stack-tags"
 
-/* Presentation only — content and links live in site.ts */
+/* Presentation only — content and links live in projects.ts */
 const LOOK: Record<
   FeaturedProject["id"],
   { icon: LucideIcon; tile: string; bar: string; check: string }
@@ -63,26 +64,12 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
 
       {/* Screenshot in a minimal browser frame */}
       <div className="px-4 pt-5 sm:px-5 sm:pt-6">
-        <figure className="overflow-hidden rounded-[14px] border border-line bg-surface-sunken">
-          <div
-            aria-hidden="true"
-            className="flex h-7 items-center gap-1.5 border-b border-line px-3"
-          >
-            <span className="h-2 w-2 rounded-full bg-line-strong" />
-            <span className="h-2 w-2 rounded-full bg-line-strong" />
-            <span className="h-2 w-2 rounded-full bg-line-strong" />
-          </div>
-          <div className="relative aspect-[16/10]">
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              priority
-              sizes="(min-width: 1200px) 520px, (min-width: 768px) 45vw, (min-width: 640px) 90vw, 100vw"
-              className="object-cover object-top"
-            />
-          </div>
-        </figure>
+        <BrowserFrame
+          src={image.src}
+          alt={image.alt}
+          priority
+          sizes="(min-width: 1200px) 520px, (min-width: 768px) 45vw, (min-width: 640px) 90vw, 100vw"
+        />
       </div>
 
       <div className="flex flex-1 flex-col px-5 pb-5 pt-5 sm:px-7 sm:pb-6 sm:pt-6">
@@ -125,13 +112,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         {/* Stack + destination, pinned to the bottom so both cards line up */}
         <div className="mt-auto pt-6">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-line pt-4">
-            <ul role="list" aria-label="Tech stack" className="flex flex-wrap gap-1.5">
-              {stack.map((tag) => (
-                <li key={tag} className="stack-tag">
-                  {tag}
-                </li>
-              ))}
-            </ul>
+            <StackTags items={stack} />
 
             {href === null ? (
               <ComingSoon label="Link coming soon" />
