@@ -12,7 +12,10 @@ const inter = Inter({
 })
 
 const title = `${site.name} (${site.brand}) — ${site.role}`
-const description = `${site.name}, ${site.role} in ${site.location}, open to Fresher/Junior roles. ${site.pitch}`
+// ~150 characters, so search results show it whole
+const description = `${site.name}, ${site.role} in ${site.location}. Spring Boot and PostgreSQL projects: ${site.projects
+  .map((p) => p.name)
+  .join(", ")}. Open to Fresher/Junior roles.`
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -28,16 +31,18 @@ export const metadata: Metadata = {
     ...site.projects.map((p) => p.name),
   ],
   authors: [{ name: site.name, url: site.url }],
+  alternates: { canonical: "/" },
+  // og:image and twitter:image come from opengraph-image.tsx / twitter-image.tsx
   openGraph: {
     title,
     description,
-    url: site.url,
+    url: "/",
     siteName: site.domain,
     type: "website",
     locale: "en_US",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description,
   },
