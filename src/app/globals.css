@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+/* ─── Font token ──────────────────────────────────────────────────────── */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*
+ * Semantic tokens exposed as Tailwind colors/shadows, so variants
+ * (hover:, group-hover:, focus-visible:) work on them. Values switch per theme below.
+ */
+@theme inline {
+  --color-bg:             var(--bg);
+  --color-surface:        var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-line:           var(--border);
+  --color-line-strong:    var(--border-strong);
+  --color-line-hover:     var(--border-hover);
+
+  --color-fg:        var(--fg);
+  --color-fg-strong: var(--fg-strong);
+  --color-fg-muted:  var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+
+  --color-accent:         var(--accent);
+  --color-accent-hover:   var(--accent-hover);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-accent-on:      var(--accent-on);
+  --color-accent-ink:     var(--accent-ink);
+
+  --color-mint:          var(--mint);
+  --color-mint-ink:      var(--mint-ink);
+  --color-lavender:      var(--lavender);
+  --color-lavender-ink:  var(--lavender-ink);
+  --color-butter:        var(--butter);
+  --color-butter-soft:   var(--butter-soft);
+  --color-butter-ink:    var(--butter-ink);
+  --color-pink:          var(--pink);
+
+  --color-cv-surface:      var(--cv-surface);
+  --color-cv-border:       var(--cv-border);
+  --color-cv-border-hover: var(--cv-border-hover);
+
+  --shadow-card:    var(--shadow-md);
+  --shadow-card-sm: var(--shadow-sm);
+}
+
+/* ─── Theme: dark (default) ──────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  --bg:             #111315;
+  --surface:        #181B1F;
+  --surface-sunken: #14171A;
+  --border:         #2A2F35;
+  --border-strong:  #3A4047;
+  --border-hover:   color-mix(in srgb, #42D6E8 55%, #2A2F35);
+
+  --fg:        #E3E6E8;
+  --fg-strong: #F7F8F8;
+  --fg-muted:  #A1A7AE;
+  --fg-subtle: #80868D;
+
+  --accent:         #42D6E8;
+  --accent-hover:   #6BE1EF;
+  --accent-pressed: #2BBFD1;
+  --accent-on:      #0A1416;
+  --accent-ink:     #5FDDEC;
+
+  /* Pastels are muted in dark so they stay accents, not highlights */
+  --mint:         #16302F;
+  --mint-ink:     #5FDDEC;
+  --lavender:     #252240;
+  --lavender-ink: #B9ADFF;
+  --butter:       #F6C969;
+  --butter-soft:  #33291A;
+  --butter-ink:   #F6C969;
+  --pink:         #F4A5BC;
+
+  --cv-surface:      color-mix(in srgb, #42D6E8 7%, #181B1F);
+  --cv-border:       color-mix(in srgb, #42D6E8 35%, #2A2F35);
+  --cv-border-hover: color-mix(in srgb, #42D6E8 75%, #2A2F35);
+
+  --ring: #6BE1EF;
+
+  --shadow-md: 0 14px 32px -16px rgba(0, 0, 0, 0.7);
+  --shadow-sm: none;
+  --ease-out:  cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ─── Theme: light — warm off-white, white cards ─────────────────────── */
+html[data-theme="light"] {
+  color-scheme: light;
+
+  --bg:             #F7F6F2;
+  --surface:        #FFFFFF;
+  --surface-sunken: #FBFAF7;
+  --border:         #DEDED9;
+  --border-strong:  #CBCBC4;
+  --border-hover:   #2CC8DB;
+
+  --fg:        #20252B;
+  --fg-strong: #171B20;
+  --fg-muted:  #626870;
+  --fg-subtle: #6F757D;
+
+  --accent:         #42D6E8;
+  --accent-hover:   #2CC8DB;
+  --accent-pressed: #1FB4C7;
+  --accent-on:      #0E1A1D;
+  /* Cyan as text needs a darker ink to pass contrast on white */
+  --accent-ink:     #0B7A88;
+
+  --mint:         #DDF8F7;
+  --mint-ink:     #0B7A88;
+  --lavender:     #E8E3FF;
+  --lavender-ink: #5B4BC4;
+  --butter:       #F6C969;
+  --butter-soft:  #FDF1D6;
+  --butter-ink:   #8A5A00;
+  --pink:         #F4A5BC;
+
+  --cv-surface:      #F2FBFC;
+  --cv-border:       #A9E6EE;
+  --cv-border-hover: #42D6E8;
+
+  --ring: #0B7A88;
+
+  --shadow-md: 0 14px 30px -16px rgba(32, 37, 43, 0.22);
+  --shadow-sm: 0 1px 2px rgba(32, 37, 43, 0.04);
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    min-height: 100dvh;
+    overflow-x: clip;
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring);
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 1ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}
+
+/* ─── Utilities ───────────────────────────────────────────────────────── */
+@utility ring-focus {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring);
+}
+
+@layer components {
+  /* Skip link */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    background: var(--accent);
+    color: var(--accent-on);
+    border-radius: 0 0 10px 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: top 80ms ease;
+  }
+  .skip-link:focus { top: 0; }
+
+  /* Technology stack pill — project sub-cards */
+  .stack-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background-color: var(--surface);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.7;
+    color: var(--fg-muted);
+    white-space: nowrap;
+  }
+}

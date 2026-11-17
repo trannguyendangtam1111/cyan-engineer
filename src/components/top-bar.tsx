@@ -1,0 +1,37 @@
+import { site } from "@/lib/site"
+import { ThemeToggle } from "@/components/theme-toggle"
+
+export function TopBar() {
+  return (
+    <header className="w-full">
+      <div
+        className="
+          mx-auto flex h-16 max-w-[1200px] items-center
+          justify-between px-5 sm:h-20 sm:px-8 lg:px-12
+        "
+      >
+        {/* Logo / wordmark */}
+        <a
+          href="/"
+          aria-label={`${site.domain} — home`}
+          className="
+            group -m-1 flex items-center gap-2.5 rounded-[10px] p-1 text-fg-strong
+            focus-visible:outline-none focus-visible:ring-focus
+          "
+        >
+          {/* Geometric mark — two stacked layers (backend stack metaphor) */}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect width="24" height="24" rx="7" fill="var(--accent)" />
+            <rect x="6" y="7" width="12" height="4" rx="2" fill="var(--accent-on)" />
+            <rect x="6" y="13" width="8" height="4" rx="2" fill="var(--accent-on)" opacity="0.5" />
+          </svg>
+          <span className="text-[15px] font-semibold tracking-tight transition-colors duration-100 group-hover:text-accent-ink">
+            {site.domain}
+          </span>
+        </a>
+
+        <ThemeToggle />
+      </div>
+    </header>
+  )
+}
