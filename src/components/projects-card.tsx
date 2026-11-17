@@ -1,4 +1,4 @@
-import { FileText, Gamepad2, MapPin, type LucideIcon } from "lucide-react"
+import { Gamepad2, MapPin, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { isExternal, site, type Project } from "@/lib/site"
 import { ComingSoon } from "@/components/coming-soon"
@@ -6,8 +6,7 @@ import { ComingSoon } from "@/components/coming-soon"
 /* Presentation only — content and links live in site.ts */
 const LOOK: Record<Project["id"], { icon: LucideIcon; tile: string }> = {
   foodmap: { icon: MapPin, tile: "bg-mint text-mint-ink" },
-  kairo: { icon: FileText, tile: "bg-lavender text-lavender-ink" },
-  gamehub: { icon: Gamepad2, tile: "bg-butter-soft text-butter-ink" },
+  cyanarcade: { icon: Gamepad2, tile: "bg-butter-soft text-butter-ink" },
 }
 
 function ProjectRow({ id, name, tagline, stack, href }: Project) {

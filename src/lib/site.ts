@@ -4,23 +4,26 @@
  * A destination set to `null` renders as a clearly labelled "Coming soon"
  * state. Never put a guessed or example URL here.
  *
- * VERIFIED (local git remotes; public on GitHub, checked 2026-10-14)
- *   links.github     — profile
- *   kairo.href       — Desktop/Kairo   → trannguyendangtam1111/kairo
- *   gamehub.href     — Desktop/GameHub → trannguyendangtam1111/cyan-arcade
+ * VERIFIED (local git remotes; public on GitHub, checked 2026-11-17)
+ *   links.github       — profile
+ *   foodmap.href       — dev/FoodMap → trannguyendangtam1111/FoodMap
+ *   cyanarcade.href    — dev/GameHub → trannguyendangtam1111/cyan-arcade
+ *   stack, highlights  — each repo's README, cross-checked against its pom.xml
+ *                        and source (Cyan Arcade: the `main` branch)
  *
  * NEEDS INPUT — null until real details exist
  *   links.cv, links.blog, links.linkedin, links.email
- *   foodmap.href     — the FoodMap repo has no git remote and no deployment config
  */
 export type Destination = string | null
 
 export interface Project {
-  id: "foodmap" | "kairo" | "gamehub"
+  id: "foodmap" | "cyanarcade"
   name: string
   tagline: string
   /** Technology labels taken from each project's own README. */
   stack: string[]
+  /** Backend engineering points, each traceable to the project's README. */
+  highlights: string[]
   /** Public repository or live URL. */
   href: Destination
 }
@@ -62,22 +65,25 @@ export const site: SiteConfig = {
     {
       id: "foodmap",
       name: "FoodMap",
-      tagline: "Venue search built on location data.",
-      stack: ["Java", "Spring Boot", "PostGIS"],
-      href: null,
+      tagline: "Food and restaurant discovery for Ho Chi Minh City.",
+      stack: ["Java 17", "Spring Boot", "PostgreSQL/PostGIS", "React"],
+      highlights: [
+        "JWT access tokens with hashed, rotating refresh tokens and reuse detection",
+        "Vietnamese-aware search with pg_trgm and unaccent, plus PostGIS spatial filtering",
+        "Versioned Flyway migrations and per-IP rate limiting",
+      ],
+      href: "https://github.com/trannguyendangtam1111/FoodMap",
     },
     {
-      id: "kairo",
-      name: "Kairo",
-      tagline: "Turns study notes into validated, typed study documents.",
-      stack: ["Java", "Spring Boot", "Next.js"],
-      href: "https://github.com/trannguyendangtam1111/kairo",
-    },
-    {
-      id: "gamehub",
-      name: "GameHub",
-      tagline: "A web game hub with arcade games, progression, achievements, and collectible cards.",
-      stack: ["Java", "Spring Boot", "React"],
+      id: "cyanarcade",
+      name: "Cyan Arcade",
+      tagline: "A full-stack browser arcade with accounts, leaderboards, a coin economy, and trading-card packs.",
+      stack: ["Java 21", "Spring Boot", "PostgreSQL", "React/TypeScript"],
+      highlights: [
+        "Spring Security session auth with CSRF protection and USER/ADMIN roles",
+        "Transactional coin wallet with row locks, an auditable ledger, and idempotent purchases",
+        "PostgreSQL Testcontainers, ArchUnit rules, and GitHub Actions CI",
+      ],
       href: "https://github.com/trannguyendangtam1111/cyan-arcade",
     },
   ],

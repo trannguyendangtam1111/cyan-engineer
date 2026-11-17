@@ -47,7 +47,7 @@ export function BentoGrid() {
 
         <BentoCard
           title="GitHub"
-          caption="Source for Kairo, GameHub, and smaller experiments."
+          caption="Source for FoodMap, Cyan Arcade, and smaller experiments."
           href={site.links.github}
           icon={Github}
           className="order-4 sm:col-span-3 lg:col-span-4 xl:col-span-3"
