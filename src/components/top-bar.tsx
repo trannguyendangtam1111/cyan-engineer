@@ -1,4 +1,5 @@
 import { site } from "@/lib/site"
+import { NavLink } from "@/components/nav-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function TopBar() {
@@ -30,7 +31,12 @@ export function TopBar() {
           </span>
         </a>
 
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <nav aria-label="Site">
+            <NavLink href="/projects">Projects</NavLink>
+          </nav>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   )

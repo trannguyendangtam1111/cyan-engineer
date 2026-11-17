@@ -4,6 +4,7 @@ import "./globals.css"
 import { site } from "@/lib/site"
 import { featuredProjects } from "@/lib/projects"
 import { TopBar } from "@/components/top-bar"
+import { Footer } from "@/components/footer"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +21,8 @@ const description = `${site.name}, ${site.role} in ${site.location}. Spring Boot
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title,
+  // The homepage uses `default`; other routes set a short title, e.g. "Projects · Tran Nguyen Dang Tam"
+  title: { default: title, template: `%s · ${site.name}` },
   description,
   keywords: [
     "Java",
@@ -75,6 +77,7 @@ export default function RootLayout({
         </a>
         <TopBar />
         {children}
+        <Footer />
       </body>
     </html>
   )
