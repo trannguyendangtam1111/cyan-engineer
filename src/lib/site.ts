@@ -10,9 +10,11 @@
  *   cyanarcade.href    — dev/GameHub → trannguyendangtam1111/cyan-arcade
  *   stack, highlights  — each repo's README, cross-checked against its pom.xml
  *                        and source (Cyan Arcade: the `main` branch)
+ *   skills             — only technologies used in FoodMap or Cyan Arcade
+ *                        (pom.xml, frontend sources, migrations, CI workflow)
  *
  * NEEDS INPUT — null until real details exist
- *   links.cv, links.blog, links.linkedin, links.email
+ *   links.cv, links.linkedin, links.email
  */
 export type Destination = string | null
 
@@ -30,6 +32,12 @@ export interface Project {
   href: Destination
 }
 
+export interface SkillGroup {
+  id: "languages" | "backend" | "database" | "tools"
+  label: string
+  items: string[]
+}
+
 interface SiteConfig {
   name: string
   domain: string
@@ -40,13 +48,12 @@ interface SiteConfig {
   links: {
     github: Destination
     cv: Destination
-    /** The personal blog — not built yet. */
-    blog: Destination
     linkedin: Destination
     /** Full `mailto:` URL. */
     email: Destination
   }
   projects: Project[]
+  skills: SkillGroup[]
 }
 
 export const site: SiteConfig = {
@@ -59,7 +66,6 @@ export const site: SiteConfig = {
   links: {
     github: "https://github.com/trannguyendangtam1111",
     cv: null,
-    blog: null,
     linkedin: null,
     email: null,
   },
@@ -95,6 +101,28 @@ export const site: SiteConfig = {
         alt: "Cyan Arcade hub page: a welcome banner, completed daily challenges for Snake, 2048, and Tetris, and the featured games row.",
       },
       href: "https://github.com/trannguyendangtam1111/cyan-arcade",
+    },
+  ],
+  skills: [
+    {
+      id: "languages",
+      label: "Languages",
+      items: ["Java", "TypeScript", "JavaScript", "SQL"],
+    },
+    {
+      id: "backend",
+      label: "Backend",
+      items: ["Spring Boot", "Spring Security", "REST APIs", "JPA / Hibernate"],
+    },
+    {
+      id: "database",
+      label: "Database",
+      items: ["PostgreSQL", "PostGIS", "Flyway"],
+    },
+    {
+      id: "tools",
+      label: "Tools & Testing",
+      items: ["Git", "Docker", "JUnit 5", "Testcontainers", "GitHub Actions"],
     },
   ],
 }

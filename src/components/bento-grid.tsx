@@ -1,20 +1,22 @@
-import { Github, Mail, PenLine } from "lucide-react"
+import { Github, Mail } from "lucide-react"
 import { site } from "@/lib/site"
 import { BentoCard } from "@/components/bento-card"
 import { CVCard } from "@/components/cv-card"
 import { ProjectCard } from "@/components/projects-card"
+import { SkillsCard } from "@/components/skills-card"
 
 /*
- * Two tiers: project cards + CV are primary, Writing / GitHub / Contact secondary.
+ * Two tiers: project cards, Skills and CV are primary, GitHub / Contact secondary.
  *
  *   Desktop (lg, 12 col):  FoodMap 6 | Cyan Arcade 6
- *                          CV 3 | Writing 3 | GitHub 3 | Contact 3
+ *                          Skills 8  | CV 4
+ *                          GitHub 6  | Contact 6
  *   Tablet  (sm, 6 col):   FoodMap 6
  *                          Cyan Arcade 6
- *                          CV 3 (2 rows) | Writing 3
- *                                        | GitHub 3
- *                          Contact 6
- *   Mobile  (1 col):       CV, FoodMap, Cyan Arcade, Writing, GitHub, Contact
+ *                          Skills 6
+ *                          CV 3 (2 rows) | GitHub 3
+ *                                        | Contact 3
+ *   Mobile  (1 col):       CV, FoodMap, Cyan Arcade, Skills, GitHub, Contact
  */
 export function BentoGrid() {
   return (
@@ -24,8 +26,8 @@ export function BentoGrid() {
         <CVCard
           className="
             order-first
-            sm:order-2 sm:col-span-3 sm:row-span-2
-            lg:col-span-3 lg:row-span-1
+            sm:order-3 sm:col-span-3 sm:row-span-2
+            lg:col-span-4 lg:row-span-1
           "
         />
 
@@ -37,21 +39,14 @@ export function BentoGrid() {
           />
         ))}
 
-        {/* Entry point to the personal blog (not built yet) */}
-        <BentoCard
-          title="Writing"
-          caption="Notes on what I build, learn, and discover."
-          href={site.links.blog}
-          icon={PenLine}
-          className="order-3 sm:col-span-3"
-        />
+        <SkillsCard className="order-3 sm:order-2 sm:col-span-6 lg:col-span-8" />
 
         <BentoCard
           title="GitHub"
           caption="Source for FoodMap, Cyan Arcade, and smaller experiments."
           href={site.links.github}
           icon={Github}
-          className="order-4 sm:col-span-3"
+          className="order-4 sm:col-span-3 lg:col-span-6"
         />
 
         <BentoCard
@@ -59,7 +54,7 @@ export function BentoGrid() {
           caption="About backend work, systems, or to talk shop."
           href={site.links.email}
           icon={Mail}
-          className="order-5 sm:col-span-6 lg:col-span-3"
+          className="order-5 sm:col-span-3 lg:col-span-6"
         />
       </div>
     </nav>
