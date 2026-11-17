@@ -11,10 +11,8 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 })
 
-const title = `${site.name} — ${site.role}`
-const description = `${site.role}. ${site.pitch} Projects: ${site.projects
-  .map((p) => p.name)
-  .join(", ")}.`
+const title = `${site.name} (${site.brand}) — ${site.role}`
+const description = `${site.name}, ${site.role} in ${site.location}, open to Fresher/Junior roles. ${site.pitch}`
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -24,6 +22,9 @@ export const metadata: Metadata = {
     "Java",
     "Backend Engineer",
     "Spring Boot",
+    site.name,
+    site.brand,
+    site.location,
     ...site.projects.map((p) => p.name),
   ],
   authors: [{ name: site.name, url: site.url }],

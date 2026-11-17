@@ -5,6 +5,7 @@
  * "Coming soon"). Never put a guessed or example URL here.
  *
  * VERIFIED (local git remotes; public on GitHub, checked 2026-11-17)
+ *   name               — full name as printed on the CV (no diacritics there)
  *   links.github       — profile
  *   links.cv           — the owner's CV.pdf, published with approval (2026-11-17)
  *   links.email        — the address printed on that CV, approved for the site
@@ -41,7 +42,11 @@ export interface SkillGroup {
 }
 
 interface SiteConfig {
+  /** Professional display name — matches the CV. */
   name: string
+  /** Personal brand, behind the cyan.engineer domain. */
+  brand: string
+  location: string
   domain: string
   url: string
   role: string
@@ -59,12 +64,15 @@ interface SiteConfig {
 }
 
 export const site: SiteConfig = {
-  name: "Cyan",
+  name: "Tran Nguyen Dang Tam",
+  brand: "Cyan",
+  location: "Ho Chi Minh City",
   domain: "cyan.engineer",
   url: "https://cyan.engineer",
   role: "Java Backend Engineer",
-  pitch: "I build software projects with Java, Spring Boot, and modern web technologies.",
-  availability: "Available for backend roles · Remote · EU",
+  pitch:
+    "I build backend systems with Java and Spring Boot: secure REST APIs, PostgreSQL databases, and tested services, shown in FoodMap and Cyan Arcade.",
+  availability: "Open to Work · Ho Chi Minh City",
   links: {
     github: "https://github.com/trannguyendangtam1111",
     cv: "/cv/tran-nguyen-dang-tam-cv.pdf",

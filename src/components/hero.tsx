@@ -38,7 +38,7 @@ export function Hero() {
           className="text-fg-strong font-bold text-balance leading-[1.05] tracking-[-0.035em]"
           style={{ fontSize: "clamp(38px, 5vw, 56px)" }}
         >
-          Hi, I&apos;m {site.name}.
+          {site.name}
         </h1>
 
         {/* Role — reads immediately after the name */}
