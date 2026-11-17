@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 import { site } from "@/lib/site"
 import { featuredProjects, otherProjects, projects } from "@/lib/projects"
 import { ProjectCard } from "@/components/projects-card"
+import { Breadcrumb } from "@/components/project/breadcrumb"
 import { ProjectListCard } from "@/components/project/project-list-card"
 import { alt, contentType, size } from "@/app/opengraph-image"
 
@@ -47,27 +47,7 @@ export default function ProjectsPage() {
     >
       {/* Top-bar → page header */}
       <header className="mt-6 sm:mt-10 lg:mt-12">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center gap-2 text-[13px] font-medium leading-none text-fg-muted">
-            <li>
-              <Link
-                href="/"
-                className="
-                  -m-1 rounded-[6px] p-1 transition-colors duration-100
-                  hover:text-accent-ink focus-visible:outline-none focus-visible:ring-focus
-                "
-              >
-                Home
-              </Link>
-            </li>
-            <li aria-hidden="true" className="text-fg-subtle">
-              /
-            </li>
-            <li aria-current="page" className="text-fg">
-              Projects
-            </li>
-          </ol>
-        </nav>
+        <Breadcrumb trail={[{ href: "/", label: "Home" }]} current="Projects" />
 
         <h1
           className="mt-5 text-fg-strong font-bold leading-[1.05] tracking-[-0.035em]"

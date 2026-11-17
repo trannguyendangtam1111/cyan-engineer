@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Github } from "lucide-react"
 import { site } from "@/lib/site"
 import { featuredProjects } from "@/lib/projects"
@@ -12,6 +13,7 @@ import { SkillsCard } from "@/components/skills-card"
  * DOM order is the reading order at every width — no `order-*` overrides.
  *
  *   Desktop (lg, 12 col):  FoodMap 6 | Cyan Arcade 6
+ *                          "View all projects" link (full width, every breakpoint)
  *                          Skills 8  | CV 4
  *                          GitHub 6  | Contact 6
  *   Tablet  (md, 6 col):   FoodMap 3 | Cyan Arcade 3
@@ -34,6 +36,22 @@ export function BentoGrid() {
             className="sm:col-span-6 md:col-span-3 lg:col-span-6"
           />
         ))}
+
+        {/* Quiet link under the featured projects, right-aligned from sm up */}
+        <div className="flex sm:col-span-6 sm:justify-end lg:col-span-12">
+          <Link
+            href="/projects"
+            className="
+              -my-1 inline-flex items-center gap-1.5 rounded-[8px] px-1 py-1
+              text-[14px] font-semibold text-fg-muted underline-offset-4
+              transition-colors duration-100 hover:text-accent-ink hover:underline
+              focus-visible:outline-none focus-visible:ring-focus
+            "
+          >
+            View all projects
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
 
         <SkillsCard className="sm:col-span-6 lg:col-span-8" />
 

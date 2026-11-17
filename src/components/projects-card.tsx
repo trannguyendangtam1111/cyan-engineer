@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Check, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { isExternal } from "@/lib/site"
@@ -16,18 +17,35 @@ interface ProjectCardProps {
 
 /*
  * Primary-tier card, one per project: screenshot in a minimal browser frame,
- * name + tagline, backend highlights, stack tags and the GitHub link.
+ * name + tagline, backend highlights, stack tags and links.
  *
- * The <article> is not a link. The "View on GitHub" link stretches over the
- * whole card with an ::after overlay, so the card is clickable while the
- * link keeps a short accessible name. Its focus ring is drawn on the card.
+ * The <article> is not a link. Its primary link (the case study, or GitHub
+ * when there is no case study) stretches over the whole card with an ::after
+ * overlay, and its focus ring is drawn on the card. A secondary GitHub link
+ * sits above the overlay (relative z-10), so both work on their own — no
+ * nested anchors, and the overlay never blocks the second link.
  */
 export function ProjectCard({ project, headingLevel: Heading = "h2", className }: ProjectCardProps) {
-  const { id, name, tagline, stack, highlights, image, repository: href } = project
+  const { id, slug, name, tagline, stack, highlights, image, repository, detail } = project
   const look = PROJECT_LOOK[id]
   const Icon = look.icon
-  const external = href !== null && isExternal(href)
+  const caseStudy = detail !== undefined ? `/projects/${slug}` : null
+  const primary = caseStudy ?? repository
+  const repoExternal = repository !== null && isExternal(repository)
   const titleId = `project-${id}-title`
+
+  const githubLabel = (
+    <>
+      <Github aria-hidden="true" size={15} strokeWidth={2} />
+      View on GitHub
+      <span aria-hidden="true">↗</span>
+      <span className="sr-only">
+        : {name} repository{repoExternal ? " (opens in new tab)" : ""}
+      </span>
+    </>
+  )
+  const linkText = "inline-flex items-center gap-1.5 rounded-[8px] text-[14px] font-semibold"
+  const stretched = "after:absolute after:inset-0 after:content-[''] focus-visible:shadow-none"
 
   return (
     <article
@@ -35,10 +53,10 @@ export function ProjectCard({ project, headingLevel: Heading = "h2", className }
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-[20px] sm:rounded-[24px]",
         "border border-line bg-surface shadow-card-sm",
-        href !== null && [
+        primary !== null && [
           "transition-[translate,border-color,box-shadow] duration-150 ease-[var(--ease-out)]",
           "hover:border-line-hover hover:shadow-card motion-safe:hover:-translate-y-0.5",
-          "has-[a:focus-visible]:ring-focus",
+          "has-[[data-card-link]:focus-visible]:ring-focus",
         ],
         className
       )}
@@ -93,31 +111,46 @@ export function ProjectCard({ project, headingLevel: Heading = "h2", className }
           ))}
         </ul>
 
-        {/* Stack + destination, pinned to the bottom so both cards line up */}
+        {/* Stack + destinations, pinned to the bottom so both cards line up */}
         <div className="mt-auto pt-6">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-line pt-4">
             <StackTags items={stack} />
 
-            {href === null ? (
+            {primary === null ? (
               <ComingSoon label="Link coming soon" />
+            ) : caseStudy !== null ? (
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <Link
+                  href={caseStudy}
+                  data-card-link
+                  className={cn(linkText, "text-accent-ink underline-offset-4 group-hover:underline", stretched)}
+                >
+                  View case study
+                  <span aria-hidden="true">→</span>
+                  <span className="sr-only">: {name}</span>
+                </Link>
+                {repository !== null && (
+                  <a
+                    href={repository}
+                    {...(repoExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className={cn(
+                      linkText,
+                      "relative z-10 text-fg-muted underline-offset-4 transition-colors duration-100",
+                      "hover:text-accent-ink hover:underline"
+                    )}
+                  >
+                    {githubLabel}
+                  </a>
+                )}
+              </div>
             ) : (
               <a
-                href={href}
-                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="
-                  inline-flex items-center gap-1.5 rounded-[8px]
-                  text-[14px] font-semibold text-accent-ink
-                  underline-offset-4 group-hover:underline
-                  after:absolute after:inset-0 after:content-['']
-                  focus-visible:shadow-none
-                "
+                href={primary}
+                data-card-link
+                {...(repoExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className={cn(linkText, "text-accent-ink underline-offset-4 group-hover:underline", stretched)}
               >
-                <Github aria-hidden="true" size={15} strokeWidth={2} />
-                View on GitHub
-                <span aria-hidden="true">↗</span>
-                <span className="sr-only">
-                  : {name} repository{external ? " (opens in new tab)" : ""}
-                </span>
+                {githubLabel}
               </a>
             )}
           </div>
