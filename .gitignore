@@ -44,3 +44,6 @@ next-env.d.ts
 *.iml
 
 .claude/settings.local.json
+
+# Original CV export (published copy lives in public/cv/)
+/CV.pdf
