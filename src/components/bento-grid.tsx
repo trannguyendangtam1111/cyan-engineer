@@ -13,11 +13,11 @@ import { SkillsCard } from "@/components/skills-card"
  *   Desktop (lg, 12 col):  FoodMap 6 | Cyan Arcade 6
  *                          Skills 8  | CV 4
  *                          GitHub 6  | Contact 6
- *   Tablet  (sm, 6 col):   FoodMap 6
- *                          Cyan Arcade 6
+ *   Tablet  (md, 6 col):   FoodMap 3 | Cyan Arcade 3
  *                          Skills 6
- *                          CV 3 (2 rows) | GitHub 3
- *                                        | Contact 3
+ *                          CV 3 | GitHub 3
+ *                          Contact 6
+ *   Small tablet (sm):     as tablet, but project cards stacked (6 each)
  *   Mobile  (1 col):       FoodMap, Cyan Arcade, Skills, CV, GitHub, Contact
  */
 export function BentoGrid() {
@@ -27,12 +27,16 @@ export function BentoGrid() {
     <nav aria-label="Primary destinations">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-6 sm:gap-5 lg:grid-cols-12 lg:gap-6">
         {site.projects.map((project) => (
-          <ProjectCard key={project.id} project={project} className="sm:col-span-6" />
+          <ProjectCard
+            key={project.id}
+            project={project}
+            className="sm:col-span-6 md:col-span-3 lg:col-span-6"
+          />
         ))}
 
         <SkillsCard className="sm:col-span-6 lg:col-span-8" />
 
-        <CVCard className="sm:col-span-3 sm:row-span-2 lg:col-span-4 lg:row-span-1" />
+        <CVCard className="sm:col-span-3 lg:col-span-4" />
 
         {github !== null && (
           <BentoCard
@@ -45,7 +49,7 @@ export function BentoGrid() {
           />
         )}
 
-        <ContactCard className="sm:col-span-3 lg:col-span-6" />
+        <ContactCard className="sm:col-span-6 lg:col-span-6" />
       </div>
     </nav>
   )
