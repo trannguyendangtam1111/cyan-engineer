@@ -2,14 +2,11 @@ import { site } from "@/lib/site"
 import { NavLink } from "@/components/nav-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-/*
- * Main sections. An entry is shown only once its route exists: set Blog to
- * `published: true` when /blog ships, so the bar never links to a 404.
- */
+/* Main sections. Set `published: false` to hide an entry whose route does not exist yet. */
 const NAV_ITEMS = [
   { href: "/", label: "Home", published: true },
   { href: "/projects", label: "Projects", published: true },
-  { href: "/blog", label: "Blog", published: false },
+  { href: "/blog", label: "Blog", published: true },
 ] as const
 
 export function TopBar() {
@@ -36,8 +33,8 @@ export function TopBar() {
             <rect x="6" y="7" width="12" height="4" rx="2" fill="var(--accent-on)" />
             <rect x="6" y="13" width="8" height="4" rx="2" fill="var(--accent-on)" opacity="0.5" />
           </svg>
-          {/* Below 360px only the mark shows, so the nav fits; the link keeps its aria-label */}
-          <span className="text-[15px] font-semibold tracking-tight transition-colors duration-100 group-hover:text-accent-ink max-[359px]:hidden">
+          {/* Below sm only the mark shows, so three links fit; the link keeps its aria-label */}
+          <span className="text-[15px] font-semibold tracking-tight transition-colors duration-100 group-hover:text-accent-ink max-sm:hidden">
             {site.domain}
           </span>
         </a>

@@ -201,4 +201,76 @@ html[data-theme="light"] {
     color: var(--fg-muted);
     white-space: nowrap;
   }
+
+  /* Blog post body (Markdown → HTML). Minimal reading styles on the site tokens. */
+  .blog-prose {
+    color: var(--fg);
+    font-size: 16px;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+  }
+  .blog-prose > * + * { margin-top: 1.1em; }
+  .blog-prose h2,
+  .blog-prose h3,
+  .blog-prose h4 {
+    color: var(--fg-strong);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+  .blog-prose h2 { margin-top: 2em; font-size: 24px; }
+  .blog-prose h3 { margin-top: 1.6em; font-size: 19px; }
+  .blog-prose h4 { margin-top: 1.4em; font-size: 16px; }
+  .blog-prose a {
+    color: var(--accent-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    border-radius: 4px;
+  }
+  .blog-prose a:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring); }
+  .blog-prose strong { color: var(--fg-strong); font-weight: 600; }
+  .blog-prose ul,
+  .blog-prose ol { padding-left: 1.4em; }
+  .blog-prose ul { list-style: disc; }
+  .blog-prose ol { list-style: decimal; }
+  .blog-prose li + li { margin-top: 0.35em; }
+  .blog-prose li::marker { color: var(--fg-subtle); }
+  .blog-prose blockquote {
+    border-left: 3px solid var(--border-strong);
+    padding-left: 1em;
+    color: var(--fg-muted);
+  }
+  .blog-prose code {
+    padding: 0.1em 0.35em;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: var(--surface-sunken);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875em;
+  }
+  .blog-prose pre {
+    overflow-x: auto;
+    padding: 1em 1.1em;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: var(--surface-sunken);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .blog-prose pre code { padding: 0; border: 0; background: none; font-size: inherit; }
+  .blog-prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .blog-prose th,
+  .blog-prose td {
+    padding: 0.5em 0.9em;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  .blog-prose th { background-color: var(--surface); color: var(--fg-strong); font-weight: 600; }
+  .blog-prose hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
 }
