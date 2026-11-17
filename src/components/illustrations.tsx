@@ -8,8 +8,8 @@ interface IllustrationProps {
 }
 
 /*
- * Hero: three project tiles on a dot grid — a pin (FoodMap), a document
- * (Kairo) and a game pad (GameHub), plus a cyan "build" bar.
+ * Hero: two project tiles on a dot grid — a map pin (FoodMap, mint) and a
+ * game pad (Cyan Arcade, butter) — over a cyan "build" bar shared by both.
  */
 export function HeroProjects({ className }: IllustrationProps) {
   return (
@@ -30,34 +30,31 @@ export function HeroProjects({ className }: IllustrationProps) {
       <rect x="8" y="8" width="224" height="164" rx="24" fill="var(--surface)" />
       <rect x="8" y="8" width="224" height="164" rx="24" fill="url(#hero-dots)" opacity="0.6" />
 
-      {/* FoodMap tile — pin */}
-      <rect x="28" y="30" width="76" height="80" rx="18" fill="var(--mint)" />
+      {/* FoodMap tile — map pin with two nearby places */}
+      <rect x="28" y="30" width="88" height="88" rx="18" fill="var(--mint)" />
       <path
-        d="M66 88s-13-12.5-13-23.5a13 13 0 0 1 26 0C79 75.5 66 88 66 88z"
+        d="M72 92s-13-12.5-13-23.5a13 13 0 0 1 26 0C85 79.5 72 92 72 92z"
         fill="var(--mint-ink)"
       />
-      <circle cx="66" cy="64" r="4.5" fill="var(--mint)" />
+      <circle cx="72" cy="68" r="4.5" fill="var(--mint)" />
+      <circle cx="45" cy="100" r="3.5" fill="var(--mint-ink)" opacity="0.5" />
+      <circle cx="99" cy="48" r="3.5" fill="var(--mint-ink)" opacity="0.5" />
 
-      {/* Kairo tile — document lines */}
-      <rect x="116" y="30" width="96" height="62" rx="16" fill="var(--lavender)" />
-      <rect x="130" y="45" width="34" height="6" rx="3" fill="var(--lavender-ink)" />
-      <rect x="130" y="58" width="66" height="4" rx="2" fill="var(--lavender-ink)" opacity="0.55" />
-      <rect x="130" y="68" width="52" height="4" rx="2" fill="var(--lavender-ink)" opacity="0.55" />
+      {/* Cyan Arcade tile — d-pad and two buttons */}
+      <rect x="124" y="30" width="88" height="88" rx="18" fill="var(--butter-soft)" />
+      <rect x="138" y="71" width="22" height="7" rx="3.5" fill="var(--butter-ink)" />
+      <rect x="145.5" y="63.5" width="7" height="22" rx="3.5" fill="var(--butter-ink)" />
+      <circle cx="185" cy="67" r="5" fill="var(--butter-ink)" />
+      <circle cx="197" cy="80" r="5" fill="var(--butter-ink)" opacity="0.6" />
 
-      {/* GameHub tile — d-pad and buttons */}
-      <rect x="116" y="102" width="96" height="52" rx="16" fill="var(--butter-soft)" />
-      <rect x="132" y="125" width="18" height="6" rx="3" fill="var(--butter-ink)" />
-      <rect x="138" y="119" width="6" height="18" rx="3" fill="var(--butter-ink)" />
-      <circle cx="184" cy="123" r="4.5" fill="var(--butter-ink)" />
-      <circle cx="195" cy="133" r="4.5" fill="var(--butter-ink)" opacity="0.6" />
-
-      {/* Build bar */}
-      <rect x="28.5" y="122.5" width="75" height="31" rx="11.5" fill="var(--surface-sunken)" stroke="var(--border)" />
-      <rect x="38" y="135" width="38" height="6" rx="3" fill="var(--accent)" />
-      <circle cx="90" cy="138" r="3" fill="var(--border-strong)" />
+      {/* Build bar — one pipeline, both projects */}
+      <rect x="28.5" y="130.5" width="183" height="25" rx="11.5" fill="var(--surface-sunken)" stroke="var(--border)" />
+      <rect x="42" y="140" width="96" height="6" rx="3" fill="var(--accent)" />
+      <circle cx="184" cy="143" r="3.5" fill="var(--mint-ink)" />
+      <circle cx="197" cy="143" r="3.5" fill="var(--butter-ink)" />
 
       {/* Pink accent */}
-      <rect x="96" y="16" width="14" height="14" rx="4" fill="var(--pink)" transform="rotate(14 103 23)" />
+      <rect x="113" y="15" width="14" height="14" rx="4" fill="var(--pink)" transform="rotate(14 120 22)" />
 
       <rect x="8.5" y="8.5" width="223" height="163" rx="23.5" stroke="var(--border)" />
     </svg>
