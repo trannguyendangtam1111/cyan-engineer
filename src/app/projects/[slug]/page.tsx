@@ -6,7 +6,6 @@ import { ArrowLeft, ArrowRight, Check, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { isExternal, site } from "@/lib/site"
 import { detailProjects, type DetailProject, type ProjectPoint } from "@/lib/projects"
-import { alt, contentType, size } from "@/app/opengraph-image"
 import { Breadcrumb } from "@/components/project/breadcrumb"
 import { BrowserFrame } from "@/components/project/browser-frame"
 import { PROJECT_LOOK } from "@/components/project/project-look"
@@ -28,10 +27,8 @@ function findProject(slug: string) {
   return detailProjects.find((project) => project.slug === slug)
 }
 
-// The site-wide social image (app/opengraph-image.tsx). A page that sets its
-// own openGraph/twitter fields must list it, or the image is dropped.
-const socialImage = { url: "/opengraph-image", ...size, alt, type: contentType }
-
+// og:image and twitter:image come from the project-specific
+// opengraph-image.tsx / twitter-image.tsx in this folder.
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const project = findProject((await params).slug)
   if (!project) return {}
@@ -51,13 +48,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: site.domain,
       type: "article",
       locale: "en_US",
-      images: [socialImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [{ ...socialImage, url: "/twitter-image" }],
     },
   }
 }
