@@ -2,6 +2,16 @@ import { site } from "@/lib/site"
 import { NavLink } from "@/components/nav-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 
+/*
+ * Main sections. An entry is shown only once its route exists: set Blog to
+ * `published: true` when /blog ships, so the bar never links to a 404.
+ */
+const NAV_ITEMS = [
+  { href: "/", label: "Home", published: true },
+  { href: "/projects", label: "Projects", published: true },
+  { href: "/blog", label: "Blog", published: false },
+] as const
+
 export function TopBar() {
   return (
     <header className="w-full">
@@ -26,14 +36,21 @@ export function TopBar() {
             <rect x="6" y="7" width="12" height="4" rx="2" fill="var(--accent-on)" />
             <rect x="6" y="13" width="8" height="4" rx="2" fill="var(--accent-on)" opacity="0.5" />
           </svg>
-          <span className="text-[15px] font-semibold tracking-tight transition-colors duration-100 group-hover:text-accent-ink">
+          {/* Below 360px only the mark shows, so the nav fits; the link keeps its aria-label */}
+          <span className="text-[15px] font-semibold tracking-tight transition-colors duration-100 group-hover:text-accent-ink max-[359px]:hidden">
             {site.domain}
           </span>
         </a>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <nav aria-label="Site">
-            <NavLink href="/projects">Projects</NavLink>
+            <ul role="list" className="flex items-center gap-0.5 sm:gap-1">
+              {NAV_ITEMS.filter((item) => item.published).map(({ href, label }) => (
+                <li key={href}>
+                  <NavLink href={href}>{label}</NavLink>
+                </li>
+              ))}
+            </ul>
           </nav>
           <ThemeToggle />
         </div>

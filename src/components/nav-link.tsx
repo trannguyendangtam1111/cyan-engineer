@@ -8,17 +8,20 @@ interface NavLinkProps {
   children: React.ReactNode
 }
 
-/* Top-bar link that marks itself current on its route and any route below it. */
+/*
+ * Top-bar link that marks itself current on its route and any route below it.
+ * Home ("/") is current only on the homepage itself.
+ */
 export function NavLink({ href, children }: NavLinkProps) {
   const pathname = usePathname()
-  const active = pathname === href || pathname.startsWith(`${href}/`)
+  const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
       className="
-        flex h-10 items-center rounded-full px-4
+        flex h-10 items-center rounded-full px-3 sm:px-4
         text-[14px] font-medium text-fg-muted
         transition-colors duration-100 ease-in-out
         hover:bg-surface hover:text-fg-strong
