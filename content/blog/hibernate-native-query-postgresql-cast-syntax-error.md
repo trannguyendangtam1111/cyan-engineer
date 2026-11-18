@@ -4,7 +4,7 @@ description: "Why a PostgreSQL ::geography cast in a Hibernate 6.4.4 native quer
 date: 2026-11-18
 tags: [hibernate, postgresql, spring-data-jpa, postgis]
 slug: hibernate-native-query-postgresql-cast-syntax-error
-published: false
+published: true
 ---
 
 If a Hibernate native query with a PostgreSQL cast such as `geom::geography` fails with `syntax error at or near ":"` (SQLState 42601), check your Hibernate version. Hibernate 6.4.4 reads `::` in a native query as an escaped colon and sends a single `:` to PostgreSQL. Hibernate 6.4.5 changed that behaviour ([HHH-17759](https://hibernate.atlassian.net/browse/HHH-17759)). The spelling that worked on every version I tested is standard SQL: `CAST(geom AS geography)`.
@@ -104,7 +104,7 @@ SELECT id FROM places WHERE ST_DWithin(geom:geography,
 
 and answered `syntax error at or near ":" at character 44`. On 6.4.5, 6.6.59 and 7.4.16 it received `geom::geography` and `4326)::geography`, and the query ran. (The `$1` placeholders come from the JDBC driver; Hibernate sends `?`.)
 
-For V3 and V4, PostgreSQL received `::` on all four versions. From 6.4.5 on, V4 also logs this warning once for each `::::`:
+For V3 and V4, PostgreSQL received `::` on all four versions. On 6.4.5, 6.6.59 and 7.4.16, V4 also logged this warning once for each `::::`:
 
 ```text
 HHH90000031: The native query colon escaping used for the [::::] operator is
@@ -117,27 +117,27 @@ Before a native query reaches JDBC, Hibernate scans the SQL for parameters with 
 
 In **6.4.4**, the rule is short: two colons in a row are an *escaped* colon, and the parser emits one `:`. That is how `geom::geography` becomes `geom:geography`. Every other colon starts a named parameter.
 
-The HHH-17759 issue was reported against 6.4.4 with an example almost identical to this one, `now()::text` turning into `now():text`. In the discussion, a Hibernate maintainer explained that `::` was an intentional but undocumented escape for a literal colon, and that `::::` was the way to get `::` through.
+The HHH-17759 issue was reported against 6.4.4 with the same kind of example: `now()::text` turning into `now():text`. In the discussion, a Hibernate maintainer explained that `::` was an intentional but undocumented escape for a literal colon, and that `::::` was the way to get `::` through.
 
 In **6.4.5, 6.6.59 and 7.4.16** the parser works differently. HHH-17759 lists 6.4.5 and 6.5.0.CR1 as the fix versions.
 
-- A colon starts a named parameter only when the next character can start a Java identifier. `:lat` is a parameter; the second colon of `::` is not followed by a letter.
+- A colon starts a named parameter only when the next character can start a Java identifier. In `:lat` it is followed by `l`, so `:lat` is a parameter. In `::geography` the first colon is followed by another colon, so it is not.
 - Any other colon is passed through, together with any colons directly after it, so `::geography` stays `::geography`.
 - `::::` is still turned into `::`, and `::=` into `:=`, for backwards compatibility, but both log the HHH90000031 deprecation warning.
 
-The source of all four versions confirms this, and the results above match it. In every version, a backslash makes the parser emit the next character literally, which is why V3 works everywhere. In a Java string literal or text block the backslash itself must be escaped, so V3 is written `geom\\:\\:geography` in Java source.
+The parser source of those three versions contains this logic, and the results above match it. In all four versions, a backslash makes the parser emit the next character literally, which is why V3 works everywhere. In a Java string literal or text block the backslash itself must be escaped, so V3 is written `geom\\:\\:geography` in Java source.
 
 I did not find this colon escaping described in the Hibernate 6.5 migration guide or in the 6.6 or 7.1 User Guide. One comment on HHH-17759 also reports that the 6.4.5 change broke purely numeric named parameters such as `:1`. I did not test that.
 
-```mermaid How the same native query reaches PostgreSQL under Hibernate 6.4.4 and under 6.4.5 or later, and why a parameter followed by a cast fails in every tested version. Based on the ParameterParser source and the PostgreSQL statement log of the reproduction.
+```mermaid How the same native query reaches PostgreSQL under Hibernate 6.4.4 and under 6.4.5, 6.6.59 and 7.4.16, and why a parameter followed by a cast fails in every tested version. Based on the ParameterParser source and the PostgreSQL statement log of the reproduction.
 flowchart TD
   accTitle: How Hibernate's native-query parser handles PostgreSQL double-colon casts
-  accDescr: A native query containing geom::geography is scanned by Hibernate's ParameterParser. In Hibernate 6.4.4 the double colon is read as an escaped colon, so PostgreSQL receives geom:geography and rejects it with a syntax error, SQLState 42601. In Hibernate 6.4.5 and later the double colon is passed through, so PostgreSQL receives geom::geography and the query runs. Separately, in every tested version a named parameter followed directly by a cast, such as :radius::float8, is read as one parameter named radius::float8, so setting the parameter radius fails before any SQL is sent.
+  accDescr: A native query containing geom::geography is scanned by Hibernate's ParameterParser. In Hibernate 6.4.4 the double colon is read as an escaped colon, so PostgreSQL receives geom:geography and rejects it with a syntax error, SQLState 42601. In Hibernate 6.4.5, 6.6.59 and 7.4.16 the double colon is passed through, so PostgreSQL receives geom::geography and the query runs. Separately, in every tested version a named parameter followed directly by a cast, such as :radius::float8, is read as one parameter named radius::float8, so setting the parameter radius fails before any SQL is sent.
   Q["Native query<br/>geom::geography<br/>:radius::float8"] --> P{"Hibernate<br/>ParameterParser"}
   P -->|"6.4.4"| A["'::' read as an<br/>escaped colon"]
   A --> A2["PostgreSQL receives<br/>geom:geography"]
   A2 --> A3["syntax error at or<br/>near ':' (42601)"]
-  P -->|"6.4.5 and later"| B["'::' passed<br/>through"]
+  P -->|"6.4.5, 6.6.59,<br/>7.4.16"| B["'::' passed<br/>through"]
   B --> B2["PostgreSQL receives<br/>geom::geography"]
   B2 --> B3["Cast runs,<br/>query succeeds"]
   P -->|"all tested versions"| C["Parameter named<br/>radius::float8"]
@@ -157,7 +157,7 @@ The query is never sent. `setParameter("radius", ...)` fails because no paramete
                    named parameters [lng, radius::float8, lat]
 ```
 
-Upgrading Hibernate does not help here. Write the cast around the parameter instead: `CAST(:radius AS float8)`. FoodMap's place search already does this with `CAST(:radiusMeters AS DOUBLE PRECISION)`, and that query passes on 6.4.4 once its other casts are fixed.
+None of the tested versions accepts this form, so upgrading to them does not help. Write the cast around the parameter instead: `CAST(:radius AS float8)`. FoodMap's place search already does this with `CAST(:radiusMeters AS DOUBLE PRECISION)`, and that query passes on 6.4.4 once its other casts are fixed.
 
 ## Before and after in FoodMap
 
@@ -197,22 +197,24 @@ Another query in the same repository already used `CAST(... AS geography)`, with
 The fixes are two public commits:
 
 - [`4f988c5`](https://github.com/trannguyendangtam1111/FoodMap/commit/4f988c587df2ff5f33aecea5478d36ee03d8cd6b) rewrites the two casts in `findWithinRadius`. It also adds a regression test that inserts an active place at the centre, one 999.9 m away, one 1,000.1 m away and an inactive one 500 m away. The test expects exactly the first two, nearest first.
-- [`2a029d7`](https://github.com/trannguyendangtam1111/FoodMap/commit/2a029d72fac7f909a0410bbb4632e9297f66d378) rewrites the five casts in `searchPlaces` and adds a paged regression test. Three active places lie inside the radius. With a page size of 2 the first page is full, so Spring Data must run the count query to find the total. The test checks the first two results, a total of 3 and the single result on page 2.
+- [`2a029d7`](https://github.com/trannguyendangtam1111/FoodMap/commit/2a029d72fac7f909a0410bbb4632e9297f66d378) rewrites the five casts in `searchPlaces` and adds a paged regression test. Three active places lie inside the radius, with one active place outside it and one inactive place inside it. With a page size of 2 the first page is full, so Spring Data must run the count query to find the total. The test checks the first two results, a total of 3 and the single result on page 2.
 
 Both tests run in FoodMap's optional Testcontainers suite, with the real Flyway migrations, on Hibernate 6.4.4:
 
-| Change | Result before the fix | Result after the fix |
-| --- | --- | --- |
-| `findWithinRadius` | 4 tests, 1 error: `r.geom:geography`, 42601 at position 88 | 4 tests passed |
-| `searchPlaces` main query | 5 tests, 1 error: 42601 at position 551 | |
-| `searchPlaces` countQuery | Main query fixed alone: 5 tests, 1 error, 42601 at position 250 | 5 tests passed |
+| Run | Result |
+| --- | --- |
+| `findWithinRadius` test, before 4f988c5 | 4 tests, 1 error: 42601 at position 88 |
+| After 4f988c5 | 4 tests passed |
+| `searchPlaces` test, before 2a029d7 | 5 tests, 1 error: 42601 at position 551, in the main query |
+| Main query fixed, countQuery not yet | 5 tests, 1 error: 42601 at position 250, in the countQuery |
+| After 2a029d7 | 5 tests passed |
 
-Fixing the main query first and running the test again confirmed that the count query failed on its own. That intermediate state was never committed.
+The middle `searchPlaces` run confirmed that the count query failed on its own. That intermediate state was never committed.
 
 I chose `CAST` over the alternatives for three reasons:
 
-- **Upgrading Hibernate** to 6.4.5 or later would fix the `::` casts, but it is a larger dependency change, and it would not fix the parameter trap.
-- **`::::`** depends on an escape that newer versions deprecate.
+- **Upgrading Hibernate** to 6.4.5 or one of the later versions tested would fix the `::` casts, but it is a larger dependency change, and it would not fix the parameter trap.
+- **`::::`** depends on an escape that 6.4.5, 6.6.59 and 7.4.16 mark as deprecated.
 - **`\:\:`** works on all four versions, but it is easy to misread and needs doubled backslashes in Java.
 
 `CAST(expr AS type)` is standard SQL and behaved the same on every version tested.
@@ -250,7 +252,7 @@ I ran both commands only on Windows in Git Bash.
 ## Takeaways
 
 - If a native query that is valid PostgreSQL fails with `syntax error at or near ":"`, something between your code and the database may have changed the SQL. Turn on the PostgreSQL statement log, or read the SQL in the exception, to see what actually arrived.
-- On Hibernate 6.4.4, write PostgreSQL casts as `CAST(expr AS type)` in native queries. From 6.4.5 on, `::` passes through again.
+- On Hibernate 6.4.4, write PostgreSQL casts as `CAST(expr AS type)` in native queries. In 6.4.5, 6.6.59 and 7.4.16, `::` passed through unchanged.
 - Never put `::type` directly after a named parameter. Use `CAST(:param AS type)` on every version.
 - Run every native query at least once against the real database in a test. Mocked repositories cannot catch SQL that only PostgreSQL rejects.
 

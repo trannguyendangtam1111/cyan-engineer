@@ -62,7 +62,7 @@ LIMIT :cap
 
 The `&&` box comes first because the GIST index is built on the geometry column; the geography check alone cannot use it. Java computes that box from the radius and pads it by 1% so it never cuts off a row the exact check would keep. The `<->` operator orders by distance in degrees. That is approximate, but it is only used for ordering. The distance shown to the user ("450 m away") is calculated separately in Java with the haversine formula.
 
-One practical trap: the project writes `CAST(... AS geography)` instead of `::geography`, because a code comment records that Hibernate 6 rewrites the `::` cast inside native queries and the query fails at runtime.
+One practical trap: the project writes `CAST(... AS geography)` instead of `::geography`. FoodMap runs on Hibernate 6.4.4, which rewrites the `::` cast inside native queries to a single `:`, so the `::geography` form fails at runtime. I [reproduced this across four Hibernate versions](/blog/hibernate-native-query-postgresql-cast-syntax-error); 6.4.5, 6.6.59 and 7.4.16 pass `::` through.
 
 ## Handling Vietnamese search queries
 
