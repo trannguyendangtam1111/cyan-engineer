@@ -1,0 +1,9 @@
+# FoodMap after the fixes, RestaurantRepositoryPostgresIT (Hibernate 6.4.4.Final)
+
+# After 4f988c5:
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+# After 2a029d7:
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS

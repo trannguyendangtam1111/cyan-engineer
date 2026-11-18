@@ -1,0 +1,75 @@
+# FoodMap 4f988c5 parent (d77878c) + new test placeSearchRadiusModePagesByDistanceAndCountsOnlyActivePlacesInside
+# Stage 0: main query and countQuery both unchanged (Hibernate 6.4.4.Final)
+
+[ERROR] Tests run: 5, Failures: 0, Errors: 1, Skipped: 0
+[ERROR] com.foodmap.restaurant.repository.RestaurantRepositoryPostgresIT.placeSearchRadiusModePagesByDistanceAndCountsOnlyActivePlacesInside -- Time elapsed: 0.394 s <<< ERROR!
+org.hibernate.exception.SQLGrammarException: 
+JDBC exception executing SQL [SELECT id              AS "id",
+       name            AS "name",
+       latitude        AS "latitude",
+       longitude       AS "longitude",
+       avg_rating      AS "avgRating",
+       review_count    AS "reviewCount",
+       price_level     AS "priceLevel",
+       cuisine_type    AS "cuisineType",
+       dist_m          AS "distanceMeters"
+FROM (
+    SELECT r.id, r.name, r.latitude, r.longitude,
+           r.avg_rating, r.review_count, r.price_level,
+           r.cuisine_type, r.last_synced_at,
+           ST_Distance(
+               r.geom:geography,
+               ST_SetSRID(ST_MakePoint(?, ?), 4326):geography
+           ) AS dist_m
+    FROM restaurants r
+    WHERE r.is_active = true
+      AND (CAST(? AS DOUBLE PRECISION) IS NULL
+           OR r.geom && ST_MakeEnvelope(?, ?, ?, ?, 4326))
+      AND (CAST(? AS DOUBLE PRECISION) IS NULL
+           OR ST_DWithin(
+                  r.geom:geography,
+                  ST_SetSRID(ST_MakePoint(?, ?), 4326):geography,
+                  CAST(? AS DOUBLE PRECISION)
+              ))
+      AND (CAST(? AS TEXT) IS NULL
+           OR lower(r.cuisine_type) = lower(CAST(? AS TEXT)))
+      AND (CAST(? AS TEXT) IS NULL
+           OR to_tsvector('simple', immutable_unaccent(coalesce(r.name, '') || ' ' || coalesce(r.address, '')))
+                  @@ plainto_tsquery('simple', immutable_unaccent(CAST(? AS TEXT)))
+           OR immutable_unaccent(lower(r.name))
+                  % immutable_unaccent(lower(CAST(? AS TEXT))))
+) AS inner_q
+ORDER BY (
+    0.6 * (1.0 / (1.0 + dist_m / 1000.0))
+  + 0.3 * (COALESCE(avg_rating, 0):FLOAT / 5.0)
+        * (LN(1 + review_count) / LN(101))
+  + 0.1 * GREATEST(0.0, 1.0 - EXTRACT(EPOCH FROM (NOW() - COALESCE(last_synced_at, NOW()))) / (365 * 86400))
+) DESC fetch first ? rows only
+] [ERROR: syntax error at or near ":"
+  Position: 551] [n/a]
+
+# Stage 1 (intermediate working tree, never committed): main query fixed, countQuery unchanged
+
+[ERROR] Tests run: 5, Failures: 0, Errors: 1, Skipped: 0
+[ERROR] com.foodmap.restaurant.repository.RestaurantRepositoryPostgresIT.placeSearchRadiusModePagesByDistanceAndCountsOnlyActivePlacesInside -- Time elapsed: 0.443 s <<< ERROR!
+org.hibernate.exception.SQLGrammarException: 
+JDBC exception executing SQL [SELECT count(*)
+FROM restaurants r
+WHERE r.is_active = true
+  AND (CAST(? AS DOUBLE PRECISION) IS NULL
+       OR r.geom && ST_MakeEnvelope(?, ?, ?, ?, 4326))
+  AND (CAST(? AS DOUBLE PRECISION) IS NULL
+       OR ST_DWithin(
+              r.geom:geography,
+              ST_SetSRID(ST_MakePoint(?, ?), 4326):geography,
+              CAST(? AS DOUBLE PRECISION)
+          ))
+  AND (CAST(? AS TEXT) IS NULL
+       OR lower(r.cuisine_type) = lower(CAST(? AS TEXT)))
+  AND (CAST(? AS TEXT) IS NULL
+       OR to_tsvector('simple', immutable_unaccent(coalesce(r.name, '') || ' ' || coalesce(r.address, '')))
+              @@ plainto_tsquery('simple', immutable_unaccent(CAST(? AS TEXT)))
+       OR immutable_unaccent(lower(r.name))
+              % immutable_unaccent(lower(CAST(? AS TEXT))))
+] [ERROR: syntax error at or near ":"
+  Position: 250] [n/a]

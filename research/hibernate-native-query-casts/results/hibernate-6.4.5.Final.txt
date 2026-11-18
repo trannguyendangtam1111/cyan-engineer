@@ -1,0 +1,38 @@
+=== Hibernate 6.4.5.Final | PostgreSQL JDBC PostgreSQL JDBC Driver 42.6.1 | image postgis/postgis:16-3.4
+WARN: HHH10001002: Using built-in connection pool (not intended for production use)
+
+--- V1 ::geography
+  input SQL : SELECT id FROM places WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius) ORDER BY id
+  result    : PASS rows=[1]
+  postgres  :
+    LOG:  execute <unnamed>: SELECT id FROM places WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3) ORDER BY id
+    DETAIL:  parameters: $1 = '106.7', $2 = '10.77', $3 = '1000'
+
+--- V2 CAST(... AS geography)
+  input SQL : SELECT id FROM places WHERE ST_DWithin(CAST(geom AS geography), CAST(ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) AS geography), :radius) ORDER BY id
+  result    : PASS rows=[1]
+  postgres  :
+    LOG:  execute <unnamed>: SELECT id FROM places WHERE ST_DWithin(CAST(geom AS geography), CAST(ST_SetSRID(ST_MakePoint($1, $2), 4326) AS geography), $3) ORDER BY id
+    DETAIL:  parameters: $1 = '106.7', $2 = '10.77', $3 = '1000'
+
+--- V3 backslash-escaped \:\:
+  input SQL : SELECT id FROM places WHERE ST_DWithin(geom\:\:geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)\:\:geography, :radius) ORDER BY id
+  result    : PASS rows=[1]
+  postgres  :
+    LOG:  execute <unnamed>: SELECT id FROM places WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3) ORDER BY id
+    DETAIL:  parameters: $1 = '106.7', $2 = '10.77', $3 = '1000'
+WARN: HHH90000031: The native query colon escaping used for the [::::] operator is deprecated and will be removed. Use [::] instead.
+WARN: HHH90000031: The native query colon escaping used for the [::::] operator is deprecated and will be removed. Use [::] instead.
+
+--- V4 quadruple ::::
+  input SQL : SELECT id FROM places WHERE ST_DWithin(geom::::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::::geography, :radius) ORDER BY id
+  result    : PASS rows=[1]
+  postgres  :
+    LOG:  execute <unnamed>: SELECT id FROM places WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3) ORDER BY id
+    DETAIL:  parameters: $1 = '106.7', $2 = '10.77', $3 = '1000'
+
+--- V5 parameter then cast :radius::float8
+  input SQL : SELECT id FROM places WHERE ST_DWithin(CAST(geom AS geography), CAST(ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) AS geography), :radius::float8) ORDER BY id
+  result    : FAIL java.lang.IllegalArgumentException: Could not locate named parameter [radius], expecting one of [lng, radius::float8, lat]
+      caused by org.hibernate.query.UnknownParameterException: Could not locate named parameter [radius], expecting one of [lng, radius::float8, lat]
+  postgres  :

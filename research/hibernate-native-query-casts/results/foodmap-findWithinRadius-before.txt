@@ -1,0 +1,18 @@
+# FoodMap 4f988c5 parent (d77878c) + new test nearbyQueryReturnsActivePlacesInsideTheRadiusNearestFirst
+# Hibernate 6.4.4.Final, postgis/postgis:16-3.4, Flyway migrations V1-V9
+# mvn -B -Ppostgres-it -Dit.test=RestaurantRepositoryPostgresIT test-compile failsafe:integration-test
+
+[ERROR] Tests run: 4, Failures: 0, Errors: 1, Skipped: 0
+[ERROR] com.foodmap.restaurant.repository.RestaurantRepositoryPostgresIT.nearbyQueryReturnsActivePlacesInsideTheRadiusNearestFirst -- Time elapsed: 2.634 s <<< ERROR!
+org.hibernate.exception.SQLGrammarException: 
+JDBC exception executing SQL [SELECT * FROM restaurants r
+WHERE r.is_active = true
+  AND ST_DWithin(
+          r.geom:geography,
+          ST_SetSRID(ST_MakePoint(?, ?), 4326):geography,
+          ?
+      )
+ORDER BY r.geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)
+LIMIT ?
+] [ERROR: syntax error at or near ":"
+  Position: 88] [n/a]
