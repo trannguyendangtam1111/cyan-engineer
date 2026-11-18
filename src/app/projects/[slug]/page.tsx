@@ -2,9 +2,10 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowRight, Check, Github } from "lucide-react"
+import { ArrowDown, ArrowLeft, ArrowRight, Check, Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { isExternal, site } from "@/lib/site"
+import { getPublishedPosts } from "@/lib/blog"
 import { detailProjects, type DetailProject, type ProjectPoint } from "@/lib/projects"
 import { Breadcrumb } from "@/components/project/breadcrumb"
 import { BrowserFrame } from "@/components/project/browser-frame"
@@ -76,6 +77,9 @@ export default async function ProjectPage({ params }: PageProps) {
   const Icon = look.icon
   const external = repository !== null && isExternal(repository)
   const repoPath = repository?.replace(/^https?:\/\/github\.com\//, "")
+  // Listed slugs that are published posts, in the listed order; drafts and unknown slugs are skipped
+  const published = getPublishedPosts()
+  const relatedPosts = (detail.relatedPosts ?? []).flatMap((slug) => published.filter((post) => post.slug === slug))
 
   return (
     <main
@@ -126,6 +130,18 @@ export default async function ProjectPage({ params }: PageProps) {
               View on GitHub
               <span aria-hidden="true">↗</span>
               {external && <span className="sr-only"> (opens in new tab)</span>}
+            </a>
+          )}
+          {detail.screenshots && detail.screenshots.length > 0 && (
+            <a
+              href="#screenshots"
+              className={cn(
+                button,
+                "border border-line bg-surface text-fg-strong hover:border-line-hover hover:text-accent-ink"
+              )}
+            >
+              <ArrowDown aria-hidden="true" size={16} strokeWidth={2} />
+              Screenshots
             </a>
           )}
           <Link
@@ -229,19 +245,7 @@ export default async function ProjectPage({ params }: PageProps) {
             </div>
           </section>
 
-          <section aria-labelledby="features-heading">
-            <h2 id="features-heading" className={sectionHeading}>
-              Key features
-            </h2>
-            <ul role="list" className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-              {detail.features.map((feature) => (
-                <li key={feature.title} className="rounded-[16px] border border-line bg-surface p-4 sm:p-5">
-                  <PointText point={feature} checkClass={look.check} />
-                </li>
-              ))}
-            </ul>
-          </section>
-
+          {/* Backend engineering first: it is what this portfolio is for */}
           {detail.architecture && detail.architecture.length > 0 && (
             <section aria-labelledby="architecture-heading">
               <h2 id="architecture-heading" className={sectionHeading}>
@@ -273,8 +277,49 @@ export default async function ProjectPage({ params }: PageProps) {
             </section>
           )}
 
+          {relatedPosts.length > 0 && (
+            <section aria-labelledby="writing-heading">
+              <h2 id="writing-heading" className={sectionHeading}>
+                Related technical writing
+              </h2>
+              <ul role="list" className="mt-4 flex flex-col divide-y divide-line border-y border-line">
+                {relatedPosts.map((post) => (
+                  <li key={post.slug} className="py-4">
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="
+                        rounded-[6px] text-[16px] font-semibold leading-[1.35] text-fg-strong
+                        underline-offset-4 transition-colors duration-100
+                        hover:text-accent-ink hover:underline
+                        focus-visible:outline-none focus-visible:ring-focus
+                      "
+                    >
+                      {post.title}
+                    </Link>
+                    <p className="mt-1 text-[14px] leading-[1.6] text-fg-muted text-pretty">
+                      {post.description}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <section aria-labelledby="features-heading">
+            <h2 id="features-heading" className={sectionHeading}>
+              Key features
+            </h2>
+            <ul role="list" className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              {detail.features.map((feature) => (
+                <li key={feature.title} className="rounded-[16px] border border-line bg-surface p-4 sm:p-5">
+                  <PointText point={feature} checkClass={look.check} />
+                </li>
+              ))}
+            </ul>
+          </section>
+
           {detail.screenshots && detail.screenshots.length > 0 && (
-            <section aria-labelledby="screenshots-heading">
+            <section id="screenshots" aria-labelledby="screenshots-heading" className="scroll-mt-6">
               <h2 id="screenshots-heading" className={sectionHeading}>
                 Screenshots
               </h2>

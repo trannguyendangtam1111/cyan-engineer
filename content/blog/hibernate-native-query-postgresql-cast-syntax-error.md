@@ -5,6 +5,7 @@ date: 2026-11-18
 tags: [hibernate, postgresql, spring-data-jpa, postgis]
 slug: hibernate-native-query-postgresql-cast-syntax-error
 published: true
+sequence: 4
 ---
 
 If a Hibernate native query with a PostgreSQL cast such as `geom::geography` fails with `syntax error at or near ":"` (SQLState 42601), check your Hibernate version. Hibernate 6.4.4 reads `::` in a native query as an escaped colon and sends a single `:` to PostgreSQL. Hibernate 6.4.5 changed that behaviour ([HHH-17759](https://hibernate.atlassian.net/browse/HHH-17759)). The spelling that worked on every version I tested is standard SQL: `CAST(geom AS geography)`.

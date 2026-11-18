@@ -11,6 +11,8 @@
  *   links.email        — the address printed on that CV, approved for the site
  *   skills             — only technologies used in FoodMap or Cyan Arcade
  *                        (pom.xml, frontend sources, migrations, CI workflow)
+ *   availability       — the CV's career objective: a Fresher/Junior position
+ *   pitch              — each strength is shown in a project's source and case study
  *
  * NEEDS INPUT — null until real details exist
  *   links.linkedin
@@ -52,8 +54,8 @@ export const site: SiteConfig = {
   url: "https://cyan.engineer",
   role: "Java Backend Engineer",
   pitch:
-    "I build backend systems with Java and Spring Boot: secure REST APIs, PostgreSQL databases, and tested services, shown in FoodMap and Cyan Arcade.",
-  availability: "Open to Work · Ho Chi Minh City",
+    "I build REST APIs with Java, Spring Boot and PostgreSQL: Spring Security authentication, transactions that keep data consistent, Flyway migrations and integration tests on a real database. FoodMap and Cyan Arcade show the work, with full source on GitHub.",
+  availability: "Open to Fresher/Junior roles · Ho Chi Minh City",
   links: {
     github: "https://github.com/trannguyendangtam1111",
     cv: "/cv/tran-nguyen-dang-tam-cv.pdf",

@@ -13,7 +13,7 @@ import { SkillsCard } from "@/components/skills-card"
  * DOM order is the reading order at every width — no `order-*` overrides.
  *
  *   Desktop (lg, 12 col):  FoodMap 6 | Cyan Arcade 6
- *                          "View all projects" link (full width, every breakpoint)
+ *                          "View all projects" and "Read the blog" links (full width, every breakpoint)
  *                          Skills 8  | CV 4
  *                          GitHub 6  | Contact 6
  *   Tablet  (md, 6 col):   FoodMap 3 | Cyan Arcade 3
@@ -23,6 +23,13 @@ import { SkillsCard } from "@/components/skills-card"
  *   Small tablet (sm):     as tablet, but project cards stacked (6 each)
  *   Mobile  (1 col):       FoodMap, Cyan Arcade, Skills, CV, GitHub, Contact
  */
+const quietLink = `
+  -my-1 inline-flex items-center gap-1.5 rounded-[8px] px-1 py-1
+  text-[14px] font-semibold text-fg-muted underline-offset-4
+  transition-colors duration-100 hover:text-accent-ink hover:underline
+  focus-visible:outline-none focus-visible:ring-focus
+`
+
 export function BentoGrid() {
   const { github } = site.links
 
@@ -37,18 +44,14 @@ export function BentoGrid() {
           />
         ))}
 
-        {/* Quiet link under the featured projects, right-aligned from sm up */}
-        <div className="flex sm:col-span-6 sm:justify-end lg:col-span-12">
-          <Link
-            href="/projects"
-            className="
-              -my-1 inline-flex items-center gap-1.5 rounded-[8px] px-1 py-1
-              text-[14px] font-semibold text-fg-muted underline-offset-4
-              transition-colors duration-100 hover:text-accent-ink hover:underline
-              focus-visible:outline-none focus-visible:ring-focus
-            "
-          >
+        {/* Quiet links under the featured projects, right-aligned from sm up */}
+        <div className="flex flex-wrap gap-x-6 gap-y-2 sm:col-span-6 sm:justify-end lg:col-span-12">
+          <Link href="/projects" className={quietLink}>
             View all projects
+            <span aria-hidden="true">→</span>
+          </Link>
+          <Link href="/blog" className={quietLink}>
+            Read the blog
             <span aria-hidden="true">→</span>
           </Link>
         </div>

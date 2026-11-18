@@ -5,6 +5,7 @@ date: 2026-11-18
 tags: [spring-boot, spring-security, authentication, jwt]
 slug: jwt-vs-session-authentication-spring-boot
 published: true
+sequence: 1
 ---
 
 I built two Spring Boot projects that sign users in very differently. [FoodMap](/projects/foodmap) uses JWT access tokens with refresh tokens. [Cyan Arcade](/projects/cyan-arcade) uses server-side sessions with an HttpOnly cookie. Neither is "the modern one". They answer one question differently: where is the proof that a request belongs to a signed-in user kept?

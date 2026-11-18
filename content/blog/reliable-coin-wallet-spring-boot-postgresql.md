@@ -5,6 +5,7 @@ date: 2026-11-18
 tags: [spring-boot, postgresql, transactions, concurrency]
 slug: reliable-coin-wallet-spring-boot-postgresql
 published: true
+sequence: 3
 ---
 
 [Cyan Arcade](/projects/cyan-arcade) has a small virtual economy. Players earn coins for finishing games, high scores, achievements, daily challenges and a daily login reward, and they spend coins in a shop. The coins are not real money, but the rules are the same as for any balance: a player must never spend coins they do not have, never be paid twice for the same thing, and never lose coins because a request failed halfway through.

@@ -53,6 +53,8 @@ export interface ProjectDetail {
   /** Backend architecture and engineering decisions, when the repo documents them. */
   architecture?: ProjectPoint[]
   screenshots?: ProjectScreenshot[]
+  /** Slugs of published blog posts about this project, in display order. Titles and links come from the post files. */
+  relatedPosts?: string[]
 }
 
 export interface Project {
@@ -201,6 +203,11 @@ export const projects: Project[] = [
           caption: "Food-aware map, loading restaurants for the visible area.",
         },
       ],
+      relatedPosts: [
+        "jwt-vs-session-authentication-spring-boot",
+        "location-based-restaurant-search-postgresql-postgis",
+        "hibernate-native-query-postgresql-cast-syntax-error",
+      ],
     },
   },
   {
@@ -325,6 +332,10 @@ export const projects: Project[] = [
           height: 900,
           caption: "Tetris AI mode, available to admins.",
         },
+      ],
+      relatedPosts: [
+        "jwt-vs-session-authentication-spring-boot",
+        "reliable-coin-wallet-spring-boot-postgresql",
       ],
     },
   },

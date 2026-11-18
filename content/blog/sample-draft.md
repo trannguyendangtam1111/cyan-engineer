@@ -22,6 +22,7 @@ published: false
 | `tags`        | no       | list, e.g. `[spring-boot, postgresql]`   |
 | `slug`        | no       | kebab-case; defaults to the file name    |
 | `published`   | no       | `true` or `false`; defaults to `false`   |
+| `sequence`    | no       | publication order on the same date: 1, 2, … (higher is newer); defaults to `0` |
 
 ## Supported Markdown
 

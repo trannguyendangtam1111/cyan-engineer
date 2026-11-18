@@ -5,6 +5,7 @@ date: 2026-11-18
 tags: [postgresql, postgis, spring-boot, search]
 slug: location-based-restaurant-search-postgresql-postgis
 published: true
+sequence: 2
 ---
 
 [FoodMap](/projects/foodmap) is a food and restaurant discovery app for Ho Chi Minh City. That sounds like one search box, but it is really two problems. A restaurant has to match what the user typed, and it has to be somewhere the user can actually go. "Phở" means little without a place, and "near me" means little without a dish.

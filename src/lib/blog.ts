@@ -23,9 +23,14 @@ import { parse as parseYaml } from "yaml"
  *   tags         optional  string[]          (default [])
  *   slug         optional  kebab-case string (default: file name)
  *   published    optional  boolean           (default false: drafts stay private)
+ *   sequence     optional  whole number ≥ 0  (publication order among posts
+ *                                             with the same date: 1 first,
+ *                                             higher later; default 0)
  *
  * Every file is validated, drafts included, so a bad file fails the build.
- * Only published posts are returned by the functions below.
+ * Only published posts are returned by the functions below, newest first:
+ * by date, then by sequence (a date carries no time of day, so `sequence`
+ * records which same-day post came out last), then by title.
  */
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog")
@@ -38,6 +43,8 @@ export interface PostMeta {
   date: string
   tags: string[]
   published: boolean
+  /** Publication order among posts with the same date; 0 when not set. */
+  sequence: number
   /** Estimated reading time in whole minutes (at least 1), from the Markdown body. */
   readingMinutes: number
 }
@@ -271,7 +278,7 @@ function readingMinutes(body: string): number {
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DATE = /^\d{4}-\d{2}-\d{2}$/
-const FIELDS = new Set(["title", "description", "date", "tags", "slug", "published"])
+const FIELDS = new Set(["title", "description", "date", "tags", "slug", "published", "sequence"])
 
 function fail(file: string, message: string): never {
   throw new Error(`content/blog/${file}: ${message}`)
@@ -326,6 +333,11 @@ function parseEntry(file: string): Entry {
   const published = d.published ?? false
   if (typeof published !== "boolean") fail(file, `"published" must be true or false`)
 
+  const sequence = d.sequence ?? 0
+  if (typeof sequence !== "number" || !Number.isInteger(sequence) || sequence < 0) {
+    fail(file, `"sequence" must be a whole number, 0 or more, got "${String(d.sequence)}"`)
+  }
+
   const body = source.slice(match[0].length)
   return {
     file,
@@ -336,6 +348,7 @@ function parseEntry(file: string): Entry {
       date,
       tags: tags.map((tag) => tag.trim()),
       published,
+      sequence,
       readingMinutes: readingMinutes(body),
     },
     body,
@@ -367,7 +380,12 @@ function loadEntries(): Entry[] {
 function publishedEntries(): Entry[] {
   return loadEntries()
     .filter((entry) => entry.meta.published)
-    .sort((a, b) => b.meta.date.localeCompare(a.meta.date) || a.meta.title.localeCompare(b.meta.title))
+    .sort(
+      (a, b) =>
+        b.meta.date.localeCompare(a.meta.date) ||
+        b.meta.sequence - a.meta.sequence ||
+        a.meta.title.localeCompare(b.meta.title),
+    )
 }
 
 /** Published posts, newest first. */
