@@ -25,6 +25,8 @@ published: false
 
 ## Supported Markdown
 
+Start sections at `##`: the post title is already the page's only `h1`.
+
 Paragraphs, **bold**, *italic*, [links](https://cyan.engineer/projects) and `inline code`.
 
 ### Lists
