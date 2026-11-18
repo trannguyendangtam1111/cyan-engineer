@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Github, NotebookPen } from "lucide-react"
 import { site } from "@/lib/site"
 import { getPublishedPosts } from "@/lib/blog"
+import { blogJsonLd, serializeJsonLd } from "@/lib/structured-data"
 import { Breadcrumb } from "@/components/project/breadcrumb"
 import { FeaturedPostEntry, PostEntry } from "@/components/blog/post-entry"
 import { alt, contentType, size } from "@/app/opengraph-image"
@@ -54,6 +55,10 @@ export default function BlogPage() {
       id="main-content"
       className="mx-auto w-full max-w-[1200px] px-5 sm:px-8 lg:px-12"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogJsonLd(posts, description)) }}
+      />
       {/* Top-bar → page header */}
       <header className="mt-6 sm:mt-10 lg:mt-12">
         <Breadcrumb trail={[{ href: "/", label: "Home" }]} current="Blog" />

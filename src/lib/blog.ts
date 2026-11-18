@@ -249,11 +249,22 @@ markdown.renderer.rules.heading_close = (tokens, idx, options, env, self) => {
   return anchor + self.renderToken(tokens, idx, options)
 }
 
-/* Words of the Markdown body (code included) at 220 words a minute, rounded up. */
+/*
+ * Words of the Markdown body (code included) at 220 words a minute, rounded up.
+ * A ```mermaid fence counts only its caption: its source and accTitle/accDescr
+ * are drawn as a diagram or read by assistive technology, not read as prose.
+ */
 const WORDS_PER_MINUTE = 220
 
 function readingMinutes(body: string): number {
-  const words = body.match(/[\p{L}\p{N}][\p{L}\p{N}'’._-]*/gu)?.length ?? 0
+  const lines = body.split("\n")
+  for (const token of markdown.parse(body, {})) {
+    if (!isMermaid(token) || !token.map) continue
+    const [start, end] = token.map
+    lines.fill("", start, end)
+    lines[start] = token.info.trim().replace(/^mermaid\s*/, "")
+  }
+  const words = lines.join("\n").match(/[\p{L}\p{N}][\p{L}\p{N}'’._-]*/gu)?.length ?? 0
   return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))
 }
 

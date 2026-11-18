@@ -9,6 +9,7 @@ import { StackTags } from "@/components/project/stack-tags"
 import { PostByline } from "@/components/blog/post-byline"
 import { TableOfContents, TableOfContentsCompact } from "@/components/blog/table-of-contents"
 import { MermaidDiagrams } from "@/components/blog/mermaid-diagrams"
+import { blogPostingJsonLd, serializeJsonLd } from "@/lib/structured-data"
 import { alt, contentType, size } from "@/app/opengraph-image"
 
 /* Only published posts are generated; drafts and unknown slugs are a 404. */
@@ -69,6 +70,10 @@ export default async function BlogPostPage({ params }: PageProps) {
       id="main-content"
       className="mx-auto w-full max-w-[1200px] px-5 sm:px-8 lg:px-12"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogPostingJsonLd(post)) }}
+      />
       <div
         className={
           hasToc
