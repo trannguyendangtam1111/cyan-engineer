@@ -4,7 +4,7 @@ import { Github, NotebookPen } from "lucide-react"
 import { site } from "@/lib/site"
 import { getPublishedPosts } from "@/lib/blog"
 import { Breadcrumb } from "@/components/project/breadcrumb"
-import { PostCard } from "@/components/blog/post-card"
+import { FeaturedPostEntry, PostEntry } from "@/components/blog/post-entry"
 import { alt, contentType, size } from "@/app/opengraph-image"
 
 // The site-wide social image (app/opengraph-image.tsx). A page that sets its
@@ -41,8 +41,12 @@ const button =
   "text-fg-strong transition-colors duration-100 hover:border-line-hover hover:text-accent-ink " +
   "focus-visible:outline-none focus-visible:ring-focus"
 
+/* Small uppercase section label above the article lists */
+const sectionLabel = "text-[12px] font-semibold uppercase leading-none tracking-[0.12em] text-fg-subtle"
+
 export default function BlogPage() {
   const posts = getPublishedPosts()
+  const [featured, ...more] = posts
   const { github } = site.links
 
   return (
@@ -115,18 +119,32 @@ export default function BlogPage() {
           </div>
         </section>
       ) : (
-        <section aria-labelledby="articles-heading" className="mt-10 sm:mt-12">
-          <h2 id="articles-heading" className="sr-only">
-            Articles
-          </h2>
-          <ul role="list" className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-            {posts.map((post) => (
-              <li key={post.slug} className="flex">
-                <PostCard post={post} className="w-full" />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className="mt-10 max-w-[880px] sm:mt-12">
+          {/* Newest article first, set larger */}
+          <section aria-labelledby="latest-heading" className="border-t border-line-strong pt-6 sm:pt-8">
+            <h2 id="latest-heading" className={sectionLabel}>
+              Latest article
+            </h2>
+            <div className="mt-4">
+              <FeaturedPostEntry post={featured} />
+            </div>
+          </section>
+
+          {more.length > 0 && (
+            <section aria-labelledby="more-heading" className="mt-12 border-t border-line-strong pt-6 sm:mt-16 sm:pt-8">
+              <h2 id="more-heading" className={sectionLabel}>
+                More articles
+              </h2>
+              <ol role="list" className="mt-2 divide-y divide-line">
+                {more.map((post) => (
+                  <li key={post.slug}>
+                    <PostEntry post={post} />
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+        </div>
       )}
 
       {/* Content → Footer (rendered by the root layout) */}

@@ -229,7 +229,14 @@ html[data-theme="light"] {
     text-wrap: balance;
     scroll-margin-top: 24px;
   }
-  .blog-prose h2 { margin-top: 2.2em; font-size: 1.45em; }
+  /* Each h2 opens a section with a hairline rule, as in technical papers */
+  .blog-prose h2 {
+    margin-top: 2em;
+    padding-top: 1.1em;
+    border-top: 1px solid var(--border);
+    font-size: 1.45em;
+  }
+  .blog-prose > h2:first-child { padding-top: 0; border-top: 0; }
   .blog-prose h3 { margin-top: 1.8em; font-size: 1.2em; }
   .blog-prose h4 { margin-top: 1.6em; font-size: 1em; }
   .blog-prose h2 + *,
@@ -247,6 +254,23 @@ html[data-theme="light"] {
     transition: text-decoration-color 100ms ease;
   }
   .blog-prose a:hover { text-decoration-color: currentColor; }
+
+  /* "#" self-link after each h2/h3 (added in lib/blog.ts): shown on hover or focus */
+  .blog-prose .heading-anchor {
+    margin-left: 0.3em;
+    padding: 0 0.15em;
+    color: var(--fg-subtle);
+    font-weight: 500;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 100ms ease, color 100ms ease;
+  }
+  .blog-prose :is(h2, h3):hover .heading-anchor,
+  .blog-prose .heading-anchor:focus-visible { opacity: 1; }
+  .blog-prose .heading-anchor:hover { color: var(--accent-ink); }
+  @media (hover: none) {
+    .blog-prose .heading-anchor { opacity: 0.6; }
+  }
   .blog-prose a:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring); }
   .blog-prose strong { color: var(--fg-strong); font-weight: 600; }
 

@@ -30,11 +30,22 @@ export interface PostMeta {
   date: string
   tags: string[]
   published: boolean
+  /** Estimated reading time in whole minutes (at least 1), from the Markdown body. */
+  readingMinutes: number
+}
+
+/** An h2/h3 of a post, in document order: the source of the table of contents. */
+export interface PostHeading {
+  /** Anchor id on the rendered heading, unique within the post. */
+  id: string
+  text: string
+  level: 2 | 3
 }
 
 export interface Post extends PostMeta {
   /** Rendered from Markdown with raw HTML disabled (escaped, never passed through). */
   html: string
+  headings: PostHeading[]
 }
 
 interface Entry {
@@ -45,6 +56,69 @@ interface Entry {
 
 /* Raw HTML in Markdown is escaped; markdown-it also rejects javascript:/vbscript:/data: links. */
 const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false })
+
+/* "Session vs JWT at a glance" → "session-vs-jwt-at-a-glance"; accents folded, đ → d. */
+function slugify(text: string): string {
+  return (
+    text
+      .normalize("NFKD")
+      .replace(/\p{M}+/gu, "")
+      .replace(/đ/gi, "d")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "section"
+  )
+}
+
+/*
+ * Stable anchors: every h2/h3 gets an id derived from its text (deduplicated
+ * with -2, -3 …), is recorded in env.headings for the table of contents, and
+ * ends with a "#" link to itself. Ids only ever contain a-z, 0-9 and "-".
+ */
+markdown.core.ruler.push("heading_anchors", (state) => {
+  const env = state.env as { headings?: PostHeading[] }
+  const headings = (env.headings ??= [])
+  const used = new Set(headings.map((h) => h.id))
+  const tokens = state.tokens
+
+  for (let i = 0; i < tokens.length; i++) {
+    const open = tokens[i]
+    if (open.type !== "heading_open" || (open.tag !== "h2" && open.tag !== "h3")) continue
+
+    const inline = tokens[i + 1]
+    const text = (inline.children ?? [])
+      .filter((child) => child.type === "text" || child.type === "code_inline")
+      .map((child) => child.content)
+      .join("")
+      .trim()
+
+    const base = slugify(text)
+    let id = base
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`
+    used.add(id)
+
+    open.attrSet("id", id)
+    const close = tokens.slice(i + 2).find((t) => t.type === "heading_close")
+    if (close) close.meta = { anchorId: id }
+    headings.push({ id, text, level: open.tag === "h2" ? 2 : 3 })
+  }
+})
+
+markdown.renderer.rules.heading_close = (tokens, idx, options, env, self) => {
+  const id = tokens[idx].meta?.anchorId as string | undefined
+  const anchor = id
+    ? ` <a class="heading-anchor" href="#${id}"><span aria-hidden="true">#</span><span class="sr-only">Link to this section</span></a>`
+    : ""
+  return anchor + self.renderToken(tokens, idx, options)
+}
+
+/* Words of the Markdown body (code included) at 220 words a minute, rounded up. */
+const WORDS_PER_MINUTE = 220
+
+function readingMinutes(body: string): number {
+  const words = body.match(/[\p{L}\p{N}][\p{L}\p{N}'’._-]*/gu)?.length ?? 0
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))
+}
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -104,10 +178,19 @@ function parseEntry(file: string): Entry {
   const published = d.published ?? false
   if (typeof published !== "boolean") fail(file, `"published" must be true or false`)
 
+  const body = source.slice(match[0].length)
   return {
     file,
-    meta: { slug, title, description, date, tags: tags.map((tag) => tag.trim()), published },
-    body: source.slice(match[0].length),
+    meta: {
+      slug,
+      title,
+      description,
+      date,
+      tags: tags.map((tag) => tag.trim()),
+      published,
+      readingMinutes: readingMinutes(body),
+    },
+    body,
   }
 }
 
@@ -144,10 +227,13 @@ export function getPublishedPosts(): PostMeta[] {
   return publishedEntries().map((entry) => entry.meta)
 }
 
-/** A published post with its rendered HTML, or undefined for unknown or draft slugs. */
+/** A published post with its rendered HTML and headings, or undefined for unknown or draft slugs. */
 export function getPublishedPost(slug: string): Post | undefined {
   const entry = publishedEntries().find((e) => e.meta.slug === slug)
-  return entry && { ...entry.meta, html: markdown.render(entry.body) }
+  if (!entry) return undefined
+  const env: { headings?: PostHeading[] } = {}
+  const html = markdown.render(entry.body, env)
+  return { ...entry.meta, html, headings: env.headings ?? [] }
 }
 
 /** Slugs of published posts, for generateStaticParams. */
