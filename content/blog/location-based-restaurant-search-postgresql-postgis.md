@@ -79,6 +79,19 @@ Full-text search uses PostgreSQL's `simple` configuration. There is no built-in 
 
 Text search (`GET /api/v1/restaurants/search?query=...`) runs in two stages.
 
+```mermaid The two-stage text search: a capped, generous candidate query in PostgreSQL, then relevance ranking and pagination in Java. Simplified from RestaurantSearchService.
+flowchart TD
+  accTitle: FoodMap two-stage restaurant text search
+  accDescr: A search request first runs a candidate query in PostgreSQL that matches by name LIKE, trigram similarity, full text or a menu dish, puts names starting with the query first and stops at the candidate cap, 300 by default. If the query names a known food, a second capped query for that food's synonyms is merged in by restaurant id. The candidates and their menus go to SearchRanker in Java, which drops candidates that do not match and sorts the rest into five tiers, then by accent match, name prefix, rating and review count. The ranked list is paginated in Java and the page's restaurants are loaded and returned.
+  Q["Search request<br/>query text"] --> S1["Stage 1 · PostgreSQL<br/>name LIKE, trigram, full text or menu dish<br/>prefix matches first · LIMIT cap (default 300)"]
+  S1 --> K{"Query names<br/>a known food?"}
+  K -- yes --> S1b["Second capped query for its synonyms<br/>merged by restaurant id"]
+  K -- no --> R
+  S1b --> R["Stage 2 · Java SearchRanker<br/>drops non-matches · five tiers<br/>then accent, prefix, rating, reviews"]
+  R --> P["Paginate the ranked list in Java<br/>load that page's restaurants"]
+  P --> O["Results page"]
+```
+
 **Stage 1: a bounded candidate set in SQL.** A restaurant becomes a candidate if any of these is true (simplified from the real query):
 
 ```sql

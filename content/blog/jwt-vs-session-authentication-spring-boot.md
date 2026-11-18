@@ -63,6 +63,32 @@ The server keeps no session for this token. That is the main advantage and the m
 | XSS exposure | An HttpOnly cookie cannot be read by scripts | A token in `localStorage` can be read by any script on the page |
 | Several server instances | Needs a shared session store | Any instance with the key can verify it |
 
+```mermaid How each project signs a user in and recognises later requests. Simplified from the FoodMap and Cyan Arcade source.
+sequenceDiagram
+  accTitle: FoodMap Bearer JWT flow compared with the Cyan Arcade session cookie flow
+  accDescr: FoodMap: the React app in the browser logs in and receives a JWT access token and a refresh token, keeps both in localStorage, and sends the access token in an Authorization Bearer header. The API checks the signature and expiry and loads the user from the database. When the token has expired the API answers 401; the app clears both tokens and the user signs in again, because the refresh endpoint is not called yet. Cyan Arcade: the browser logs in with a CSRF header; the server changes the session ID, issues a new CSRF token, stores the security context in the HTTP session and sets an HttpOnly CYAN_SESSION cookie. Later requests carry that cookie automatically, plus the CSRF header when they change data, and the server looks the session up in memory.
+  participant F as FoodMap API
+  participant B as Browser
+  participant C as Cyan Arcade API
+  Note over F,B: FoodMap: JWT in a header
+  B->>F: POST /api/v1/auth/login
+  F-->>B: accessToken (JWT)<br/>+ refreshToken
+  Note over B: both kept in<br/>localStorage
+  B->>F: Authorization:<br/>Bearer JWT
+  Note over F: verifies signature<br/>and expiry, loads<br/>user from DB
+  F-->>B: response
+  B->>F: request after the<br/>token expired
+  F-->>B: 401 Unauthorized
+  Note over B: clears tokens,<br/>user signs in again<br/>(no refresh call yet)
+  Note over B,C: Cyan Arcade: session cookie
+  B->>C: POST /api/auth/login<br/>+ X-XSRF-TOKEN
+  Note over C: new session ID<br/>and CSRF token,<br/>context saved<br/>in HttpSession
+  C-->>B: Set-Cookie:<br/>CYAN_SESSION<br/>HttpOnly, SameSite=Lax
+  B->>C: later request,<br/>cookie sent<br/>automatically<br/>(+ X-XSRF-TOKEN<br/>if it changes data)
+  Note over C: session looked<br/>up in memory
+  C-->>B: response
+```
+
 ## Why FoodMap uses JWT
 
 FoodMap is a REST API with a separate React frontend. The frontend's API base URL is configurable, so the API can be served from a different origin. Bearer tokens fit that setup: each request carries its own credential, and the security chain needs no session:

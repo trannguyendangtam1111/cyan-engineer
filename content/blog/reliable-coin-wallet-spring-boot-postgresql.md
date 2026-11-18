@@ -81,6 +81,23 @@ Opening a card pack works the same way through an `Idempotency-Key` header, and 
 
 These mechanisms give **idempotent effects**, not exactly-once execution. A retried request still runs; it simply finds the earlier result and changes nothing. If the first response is lost, the client only learns that the purchase went through by retrying with the same id.
 
+```mermaid A shop purchase inside one database transaction. A repeated request id returns the earlier purchase; any failed check rolls everything back. Simplified from ShopService.purchase.
+flowchart TD
+  accTitle: Cyan Arcade shop purchase transaction
+  accDescr: A purchase request carries an item id and a client request id. Inside one transaction the wallet row is locked first. If a purchase with the same request id already exists, it is returned marked as repeated and nothing is charged. Otherwise the item must be active, the player's level high enough and the ownership limit not exceeded. The purchase row is inserted, then the debit checks that the balance covers the price, inserts a negative ledger row and updates the wallet balance. The item is added to the inventory and the transaction commits, releasing the lock. A failed check throws an exception and the whole transaction rolls back, so nothing changes.
+  A["POST /api/shop/purchases<br/>itemId + requestId"] --> L["Transaction starts<br/>lock wallet row: SELECT … FOR UPDATE"]
+  L --> D{"Purchase with this<br/>requestId exists?"}
+  D -- yes --> REP["Return the earlier purchase<br/>marked repeated · no charge"]
+  D -- no --> CH{"Item active, level high enough,<br/>ownership limit not exceeded?"}
+  CH -- no --> RB["Exception → rollback<br/>nothing changes"]
+  CH -- yes --> P["Insert purchase row"]
+  P --> BAL{"Balance covers<br/>the price?"}
+  BAL -- no --> RB
+  BAL -- yes --> LED["Insert ledger row (−price)<br/>update wallet balance"]
+  LED --> G["Add item to inventory"]
+  G --> CM["Commit · lock released"]
+```
+
 ## Constraints as the last line of defence
 
 The application checks everything first, but the schema refuses invalid states on its own:
