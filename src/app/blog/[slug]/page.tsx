@@ -8,6 +8,7 @@ import { Breadcrumb } from "@/components/project/breadcrumb"
 import { StackTags } from "@/components/project/stack-tags"
 import { PostByline } from "@/components/blog/post-byline"
 import { TableOfContents, TableOfContentsCompact } from "@/components/blog/table-of-contents"
+import { MermaidDiagrams } from "@/components/blog/mermaid-diagrams"
 import { alt, contentType, size } from "@/app/opengraph-image"
 
 /* Only published posts are generated; drafts and unknown slugs are a 404. */
@@ -107,6 +108,8 @@ export default async function BlogPostPage({ params }: PageProps) {
 
           {/* Markdown rendered at build time with raw HTML disabled (src/lib/blog.ts) */}
           <div className="blog-prose mt-8 sm:mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
+          {/* ```mermaid figures are drawn in the browser; Mermaid loads only on posts that have them */}
+          {post.hasDiagrams && <MermaidDiagrams />}
 
           <footer className="mt-12 border-t border-line pt-6 sm:mt-16">
             <Link

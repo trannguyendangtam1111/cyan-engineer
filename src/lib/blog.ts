@@ -1,6 +1,14 @@
 import fs from "node:fs"
 import path from "node:path"
-import MarkdownIt from "markdown-it"
+import MarkdownIt, { type Token } from "markdown-it"
+import hljs from "highlight.js/lib/core"
+import bash from "highlight.js/lib/languages/bash"
+import http from "highlight.js/lib/languages/http"
+import java from "highlight.js/lib/languages/java"
+import json from "highlight.js/lib/languages/json"
+import plaintext from "highlight.js/lib/languages/plaintext"
+import sql from "highlight.js/lib/languages/sql"
+import typescript from "highlight.js/lib/languages/typescript"
 import { parse as parseYaml } from "yaml"
 
 /*
@@ -46,6 +54,8 @@ export interface Post extends PostMeta {
   /** Rendered from Markdown with raw HTML disabled (escaped, never passed through). */
   html: string
   headings: PostHeading[]
+  /** The post has ```mermaid diagrams (the page then loads the diagram renderer). */
+  hasDiagrams: boolean
 }
 
 interface Entry {
@@ -54,8 +64,135 @@ interface Entry {
   body: string
 }
 
+/*
+ * Syntax highlighting at build time (no client JavaScript): highlight.js
+ * escapes the code and wraps tokens in <span class="hljs-…">, coloured by
+ * theme tokens in globals.css. Fence names: java, sql, json, http, bash
+ * (sh, shell), typescript (ts), text (plaintext, txt). Any other name is
+ * rendered as plain escaped text.
+ */
+for (const [name, language] of Object.entries({ bash, http, java, json, plaintext, sql, typescript })) {
+  hljs.registerLanguage(name, language)
+}
+hljs.registerAliases(["shell", "console"], { languageName: "bash" })
+
+function highlight(code: string, lang: string): string {
+  const language = lang.toLowerCase()
+  if (!language || !hljs.getLanguage(language)) return "" // markdown-it escapes it instead
+  return hljs.highlight(code, { language, ignoreIllegals: true }).value
+}
+
 /* Raw HTML in Markdown is escaped; markdown-it also rejects javascript:/vbscript:/data: links. */
-const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false })
+const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false, highlight })
+const { escapeHtml } = markdown.utils
+
+/*
+ * Figures. A paragraph holding only an image becomes a <figure>; the image
+ * title is the caption, with an optional source after " | Source: ":
+ *
+ *   ![Alt text describing the image](/blog/foo.png "What it shows | Source: [Origin](https://…)")
+ *
+ * A ```mermaid fence becomes a diagram figure; text after the fence name is
+ * its caption, in the same format:
+ *
+ *   ```mermaid Request flow of a purchase | Source: ShopService.purchase
+ *
+ * Captioned figures are numbered in order (Figure 1, Figure 2 …). Captions
+ * are rendered as inline Markdown (links, code), with raw HTML still escaped.
+ */
+interface FigureCaption {
+  number: number
+  caption: string
+  source?: string
+}
+
+function parseCaption(text: string): Omit<FigureCaption, "number"> | null {
+  const [caption, source] = text.split(/\s+\|\s+Source:\s*/i)
+  if (!caption.trim()) return null
+  return { caption: caption.trim(), source: source?.trim() || undefined }
+}
+
+function renderCaption(fig: FigureCaption | undefined): string {
+  if (!fig) return ""
+  const source = fig.source
+    ? `<span class="figure-source">Source: ${markdown.renderInline(fig.source)}</span>`
+    : ""
+  return (
+    `<figcaption id="figure-${fig.number}-caption">` +
+    `<span class="figure-label">Figure ${fig.number}.</span> ${markdown.renderInline(fig.caption)}${source}` +
+    `</figcaption>`
+  )
+}
+
+function isMermaid(token: Token): boolean {
+  return token.type === "fence" && token.info.trim().split(/\s+/)[0] === "mermaid"
+}
+
+markdown.core.ruler.push("figures", (state) => {
+  if (state.inlineMode) return
+  const tokens = state.tokens
+  let count = 0
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+
+    if (isMermaid(token)) {
+      ;(state.env as { hasDiagrams?: boolean }).hasDiagrams = true
+      const parsed = parseCaption(token.info.trim().replace(/^mermaid\s*/, ""))
+      token.meta = { figure: parsed ? { ...parsed, number: ++count } : undefined }
+      continue
+    }
+
+    // paragraph_open, inline (one image only), paragraph_close
+    const inline = tokens[i + 1]
+    const close = tokens[i + 2]
+    if (
+      token.type !== "paragraph_open" ||
+      token.hidden ||
+      inline?.type !== "inline" ||
+      inline.children?.length !== 1 ||
+      inline.children[0].type !== "image" ||
+      close?.type !== "paragraph_close"
+    ) {
+      continue
+    }
+
+    const image = inline.children[0]
+    const parsed = parseCaption(String(image.attrGet("title") ?? ""))
+    const attrs = (image.attrs ?? []).filter(([name]) => name !== "title")
+    image.attrs = [...attrs, ["loading", "lazy"], ["decoding", "async"]]
+
+    token.tag = close.tag = "figure"
+    token.attrSet("class", "figure")
+    close.meta = { figure: parsed ? { ...parsed, number: ++count } : undefined }
+    i += 2
+  }
+})
+
+markdown.renderer.rules.paragraph_close = (tokens, idx, options, env, self) => {
+  const token = tokens[idx]
+  if (token.tag !== "figure") return self.renderToken(tokens, idx, options)
+  return `${renderCaption(token.meta?.figure as FigureCaption | undefined)}</figure>\n`
+}
+
+/*
+ * Mermaid: the source is sent as escaped text inside the figure (readable
+ * without JavaScript); components/blog/mermaid-diagrams.tsx renders it to SVG
+ * in the browser with Mermaid's strict security level.
+ */
+const defaultFence = markdown.renderer.rules.fence!
+markdown.renderer.rules.fence = (tokens, idx, options, env, self) => {
+  const token = tokens[idx]
+  if (!isMermaid(token)) return defaultFence(tokens, idx, options, env, self)
+  const fig = token.meta?.figure as FigureCaption | undefined
+  const labelledBy = fig ? ` data-caption-id="figure-${fig.number}-caption"` : ""
+  return (
+    `<figure class="figure figure-diagram">` +
+    `<div class="diagram" data-mermaid${labelledBy}>` +
+    `<pre class="diagram-source"><code>${escapeHtml(token.content)}</code></pre>` +
+    `</div>${renderCaption(fig)}</figure>\n`
+  )
+}
 
 /* "Session vs JWT at a glance" → "session-vs-jwt-at-a-glance"; accents folded, đ → d. */
 function slugify(text: string): string {
@@ -231,9 +368,9 @@ export function getPublishedPosts(): PostMeta[] {
 export function getPublishedPost(slug: string): Post | undefined {
   const entry = publishedEntries().find((e) => e.meta.slug === slug)
   if (!entry) return undefined
-  const env: { headings?: PostHeading[] } = {}
+  const env: { headings?: PostHeading[]; hasDiagrams?: boolean } = {}
   const html = markdown.render(entry.body, env)
-  return { ...entry.meta, html, headings: env.headings ?? [] }
+  return { ...entry.meta, html, headings: env.headings ?? [], hasDiagrams: env.hasDiagrams === true }
 }
 
 /** Slugs of published posts, for generateStaticParams. */

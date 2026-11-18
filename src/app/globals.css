@@ -84,6 +84,16 @@
 
   --ring: #6BE1EF;
 
+  /* Code syntax colours (blog code blocks); each ≥ 4.5:1 on --surface-sunken */
+  --code-keyword: #B9ADFF;
+  --code-string:  #9FE0B0;
+  --code-number:  #F6C969;
+  --code-comment: #80868D;
+  --code-title:   #5FDDEC;
+  --code-type:    #F4A5BC;
+  --code-attr:    #8EC8FF;
+  --code-meta:    #A1A7AE;
+
   --shadow-md: 0 14px 32px -16px rgba(0, 0, 0, 0.7);
   --shadow-sm: none;
   --ease-out:  cubic-bezier(0.2, 0, 0, 1);
@@ -126,6 +136,15 @@ html[data-theme="light"] {
   --cv-border-hover: #42D6E8;
 
   --ring: #0B7A88;
+
+  --code-keyword: #5B4BC4;
+  --code-string:  #2F7D3F;
+  --code-number:  #8A5A00;
+  --code-comment: #686E76;
+  --code-title:   #0B7A88;
+  --code-type:    #A3385A;
+  --code-attr:    #1F5FAD;
+  --code-meta:    #626870;
 
   --shadow-md: 0 14px 30px -16px rgba(32, 37, 43, 0.22);
   --shadow-sm: 0 1px 2px rgba(32, 37, 43, 0.04);
@@ -348,6 +367,69 @@ html[data-theme="light"] {
     font-weight: 600;
   }
 
+  /* Syntax highlighting (highlight.js classes, emitted at build time in lib/blog.ts) */
+  .blog-prose :is(.hljs-keyword, .hljs-selector-tag, .hljs-doctag) { color: var(--code-keyword); }
+  .blog-prose :is(.hljs-string, .hljs-regexp, .hljs-symbol) { color: var(--code-string); }
+  .blog-prose :is(.hljs-number, .hljs-literal) { color: var(--code-number); }
+  .blog-prose :is(.hljs-comment, .hljs-quote) { color: var(--code-comment); font-style: italic; }
+  .blog-prose :is(.hljs-title, .hljs-section, .hljs-name, .hljs-built_in) { color: var(--code-title); }
+  .blog-prose :is(.hljs-type, .hljs-title.class_, .hljs-title.class_.inherited__) { color: var(--code-type); }
+  .blog-prose :is(.hljs-attr, .hljs-attribute, .hljs-property, .hljs-variable, .hljs-template-variable, .hljs-params .hljs-variable) { color: var(--code-attr); }
+  .blog-prose :is(.hljs-meta, .hljs-meta .hljs-keyword) { color: var(--code-meta); }
+  .blog-prose .hljs-meta .hljs-string { color: var(--code-string); }
+  .blog-prose .hljs-emphasis { font-style: italic; }
+  .blog-prose .hljs-strong { font-weight: 700; }
+
   .blog-prose img { max-width: 100%; height: auto; border-radius: 12px; }
   .blog-prose hr { border: 0; border-top: 1px solid var(--border); margin: 2.5em 0; }
+
+  /* Figures: images and diagrams with a numbered caption (lib/blog.ts) */
+  .blog-prose .figure { margin-top: 1.75em; margin-bottom: 1.75em; }
+  .blog-prose .figure + * { margin-top: 0; }
+  .blog-prose .figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: var(--surface-sunken);
+  }
+  .blog-prose figcaption {
+    margin-top: 0.75em;
+    color: var(--fg-muted);
+    font-size: 0.875em;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+  .blog-prose .figure-label { color: var(--fg-strong); font-weight: 600; }
+  .blog-prose .figure-source { display: block; margin-top: 0.2em; color: var(--fg-subtle); }
+
+  /* Diagram frame: the SVG keeps a readable size and scrolls inside the frame */
+  .blog-prose .diagram {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: var(--surface-sunken);
+  }
+  .blog-prose .diagram-canvas {
+    overflow-x: auto;
+    padding: 20px 12px;
+    border-radius: 12px;
+  }
+  .blog-prose .diagram-canvas:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ring); }
+  .blog-prose .diagram-canvas svg { display: block; height: auto; margin: 0 auto; }
+  /* Before rendering (or without JavaScript) the source shows as a plain code block */
+  .blog-prose .diagram pre { border: 0; border-radius: 12px; background: none; }
+  .blog-prose .diagram-details { border-top: 1px solid var(--border); }
+  .blog-prose .diagram-details summary {
+    padding: 0.55em 16px;
+    border-radius: 0 0 12px 12px;
+    color: var(--fg-muted);
+    font-size: 0.8125em;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .blog-prose .diagram-details summary:hover { color: var(--accent-ink); }
+  .blog-prose .diagram-details summary:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--ring); }
+  .blog-prose .diagram-details[open] summary { border-radius: 0; }
+  .blog-prose .diagram-details pre { margin: 0; padding-top: 4px; font-size: 13px; }
 }
